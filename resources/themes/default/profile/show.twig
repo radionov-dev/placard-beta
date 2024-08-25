@@ -1,0 +1,106 @@
+{% extends "layouts.app" %}
+
+{% block content %}
+    <div class="content content--sideRight profile">
+        {% include 'profile.partials.sidebar' %}
+        <main class="content__main">
+            {% include 'notifications' %}
+            <div class="content__header profile__header">
+                <div class="userBlock userBlock--big">
+                    <h1 class="userBlock__name content__title">
+                        {{ profile.display_name }}
+                        <small>{{ profile.city }}, {{ profile.country }}</small>
+                    </h1>
+                </div>
+            </div>
+            <div class="profile__description">
+                {% include 'profile.partials.listings' %}
+            </div>
+
+            <div class="reviews" id="profile-reviews">
+              <div class="reviews__header">
+                <div class="reviews__title">
+                    {{ __("Reviews") }}
+                    <span class="fa fa-spinner fa-spin fa-2x text-muted" id="reviews-spinner" style="display: none"></span>
+                </div>
+                <div class="reviews__sort">
+                    <a href="#profile-reviews" ic-indicator="#reviews-spinner" ic-select-from-response="#profile-reviews" ic-target="#profile-reviews" ic-get-from="{{ route('profile', {user: profile, rate: 3}) }}" ic-trigger-on="click" class="reviews__sortItem {% if rate == 3 %}active{% endif %}">{{ __("Positive") }}</a>
+                    <a href="#profile-reviews" ic-indicator="#reviews-spinner" ic-select-from-response="#profile-reviews" ic-target="#profile-reviews" ic-get-from="{{ route('profile', {user: profile, rate: 1}) }}" ic-trigger-on="click" class="reviews__sortItem {% if rate == 1 %}active{% endif %}">{{ __("Negative") }}</a>
+                    <a href="#profile-reviews" ic-indicator="#reviews-spinner" ic-select-from-response="#profile-reviews" ic-target="#profile-reviews" ic-get-from="{{ route('profile', profile) }}" ic-trigger-on="click" class="reviews__sortItem {% if not rate %}active{% endif %}">{{ __("All") }}</a>
+                </div>
+              </div>
+              {% if bd_comments|length > 0 %}
+              {% for comment in bd_comments %}
+                <div class="review">
+                        <div class="userBlock" style="margin: 0;padding:0 8px 0 0; max-width: 190px">
+                          
+                          <div class="userBlock__content">
+                            <div class="userBlock__name" style="word-break: break-word;">{{ comment.customercode }}</div>
+                             
+                          </div>
+                        </div>
+                    <div class="review__content review__text" style=" float: right; ">
+                        <div class="review__text">{{comment.comments}}</div>
+                        <div class="review__info">
+                            
+                            <span class="review__infoPrice">{{ format_btc(comment.sum, 'BTC') | raw }}</span>
+                            <div class="review__infoTime">{{comment.date}}</div>
+                        </div>
+                        <div class="review__status">
+                            <span class="status status--{{ comment.rating >=0 ? 'like' : 'dislike' }}"></span>
+                        </div>
+                    </div>
+                    <div class="review__total" style="clear: both;">
+                        
+                     </div>
+                </div>
+              {% endfor %}
+              {% elseif comments|length > 0 %}
+              {% for comment in comments %}
+                <div class="review">
+                        <a href="{{ comment.commenter.url }}" class="userBlock" style="margin: 0;padding:0 8px 0 0; max-width: 190px">
+                          {#<div class="userBlock__pic">
+                            <img src="{{ comment.commenter.avatar }}" alt="{{ comment.commenter.display_name }}" class="userBlock__img" />
+                          </div>#}
+                          <div class="userBlock__content">
+                            <div class="userBlock__name">{{ comment.commenter.display_name }} {{ include('components.star_rating', {rating: comment.commenter.averageRate(), total: comment.commenter.totalCommentCount(), date: comment.commenter.created_at.format('Y.m') }) }}</div>
+                          </div>
+                        </a>
+                    <div class="review__content review__text" style=" float: right; ">
+                        <div class="review__text">{{comment.feedback}}</div>
+                        <div class="review__info">
+                            <a href="{{route('listing', {'id' : comment.listing, 'slug' : str_slug(comment.listing.title)})}}" class="review__infoPrice">{{comment.listing.title}}</a>
+                            <span class="review__infoPrice">{{ (comment.listing.price_in_btc ? format_btc(comment.listing.btc_price, 'BTC') : format_btc(comment.listing.price, comment.listing.currency)) | raw }}</span>
+                            <div class="review__infoTime">{{comment.created_at.format('Y-m-d')}}</div>
+                        </div>
+                        <div class="review__status">
+                            <span class="status status--{{ comment.rating == 3 ? 'like' : 'dislike' }}"></span>
+                        </div>
+                    </div>
+                    <div class="review__total" style="clear: both;">
+                        {% if comment.getMeta('replay') or comment.seller_id == auth_user().id %}
+                        <form method="PUT" class="review__text" action="{{ route('account.orders.feedback_replay', order) }}" ic-put-to="{{ route('account.orders.feedback_replay', order) }}" ic-indicator="#reviews-spinner" ic-select-from-response="#profile-reviews" ic-target="#profile-reviews" style="color: #333333;float:right">
+                            <h4 style="margin: 0">Reply:</h4>
+                            {% if not comment.getMeta('replay') %}
+                                {{ csrf_field() }}
+                                <input type="hidden" name="comment_id" value="{{ comment.id }}">
+                                <textarea name="replay" style="min-height: unset;width: calc(100% - 103px); float: left;" rows="5" class="textarea" ></textarea>
+                                <button type="submit" class="button headerSearch__submit">{{ __("Submit") }}</button>
+                                {% else %}
+                                {{ comment.getMeta('replay') }}
+                            {% endif %}
+                        </form>
+                        {% endif %}
+                     </div>
+                    <div style="clear: both;"></div>
+                </div>
+              {% endfor %}
+              {{comments.links() | raw }}
+              {% else %}
+              <p>No reviews</p>
+              {% endif %}
+            </div>
+
+        </main>
+    </div>
+{% endblock %}

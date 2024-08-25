@@ -1,0 +1,10 @@
+{% if widget.metadata %}
+    <div class="promoBlocks">
+        {% for item in widget.metadata %}
+                <a href="{{ item['link'] }}" target="{{ (item.target)?item.target:'_self' }}" class="promoBlock promoBlock-{{ item['columns'] }}">
+                    <div class="promoBlock__title">{{ (item.title)?item.title:'' }}</div>
+                    <div class="promoBlock__pic" style="background-image: url('{{item['image'] }}');"></div>
+                </a>
+        {% endfor %}
+            		</div>
+{% endif %}

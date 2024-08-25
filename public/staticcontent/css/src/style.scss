@@ -1,0 +1,37 @@
+@charset "UTF-8";
+
+$width-max: 1200px;
+$width-min: 320px;
+
+$gap: 40px;
+
+$color-light: #fff;
+$color-brand: #444751;
+$color-brand-dark: #292b31;
+$color-accent: #ffa726;
+$color-accent-dark: #ee6f0b;
+$color-text: #414550;
+$color-minor: #b3b5b9;
+
+$font-size: 14px;
+$font-size-l: 16px;
+$font-height: 1.5;
+$font-family: 'Open Sans', sans-serif;
+
+@import "lib/normalize";
+@import "lib/boxsize";
+@import "lib/mixins";
+@import "lib/fonts";
+@import "lib/owl.carousel.min";
+@import "lib/owl.custom.theme";
+@import "lib/fotorama";
+@import "lib/customthemelib";
+// @import "lib/bootstrap";
+
+@import "blc/global";
+@import "blc/icons";
+@import "blc/elements";
+@import "blc/popover";
+@import "blc/header/header";
+@import "blc/content/content";
+@import "blc/footer/footer";

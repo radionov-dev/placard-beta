@@ -1,0 +1,62 @@
+{% extends "account.master" %}
+
+{% block user_area %}
+    <div class="content__header profile__header">
+        <nav class="profileNav">
+            <div class="profileNav__item {{ active(['account.edit_profile.index'], 'active') }}"><a href="{{ route('account.edit_profile.index') }}" class="profileNav__link">{{ __('Common') }}</a></div>
+            <div class="profileNav__item {{ active(['account.delivery.index'], 'active') }}"><a href="{{ route('account.delivery.index') }}" class="profileNav__link">{{ __('Delivery') }}</a></div>
+            {#<div class="profileNav__item {{ active(['account.bank-account.index'], 'active') }}"><a href="{{ route('account.bank-account.index') }}" class="profileNav__link">{{ __('Payments') }}</a></div>#}
+            {% if module_enabled('userverification') %}
+                <div class="profileNav__item {{ active(['account.userverification.index'], 'active') }}"><a href="{{ route('account.userverification.index') }}" class="profileNav__link">{{ __('Identity Verification') }}</a></div>
+            {% endif %}
+        </nav>
+    </div>
+
+    <main class="content__main">
+        {% include 'notifications' %}
+        {{ form_model(user, {'url' :  route('account.delivery.store'), 'files': false, 'id':'edit_delivery', 'class' : 'form'}) }}
+        {% set row = 0 %}
+        {% for region in regions %}
+        <div class="fieldset">
+            {% if row %}
+                <hr>
+            {% endif %}
+            <div class="inventory">
+                <h3 class="fieldset__title">{{ region.name }}</h3>
+                <div class="field" style="margin-bottom: 20px;">
+                    <div class="field__item">
+                        <a href="javascript:void(0)" onclick="$(this).closest('.fieldset').find(':checkbox').prop('checked', true);">{{ __('Select All') }}</a>
+                         /
+                        <a href="javascript:void(0)" onclick="$(this).closest('.fieldset').find(':checkbox').prop('checked', false);">{{ __('Unselect All') }}</a>
+                    </div>
+                </div>
+                <div class="field" style="margin-bottom: 20px;">
+                    <label for="delivery-settings-factor{{ row }}" class="field__title">{{ __('Delivery Price Multiplier') }}:</label>
+                    <div class="field__item">
+                        <input class="input" id="delivery-settings-factor{{ row }}" name="delivery_settings[{{ row }}][factor]" type="number" min="0" step="0.10" value="{{ delivery_settings[ row ]['factor']|number_format(2, '.', '') }}" style="max-height: 41px;">
+                    </div>
+                </div>
+                <div class="field" style="margin-bottom: 20px;">
+                    <label for="delivery-settings-days{{ row }}" class="field__title" style="width: auto;">{{ __('Additional Delivery Days') }}:</label>
+                    <div class="field__item">
+                        <input class="input" id="delivery-settings-days{{ row }}" name="delivery_settings[{{ row }}][extend_days]" type="number" min="0" step="1" value="{{ delivery_settings[ row ]['factor']|number_format }}" style="max-height: 41px;">
+                    </div>
+                </div>
+            </div>
+            <div class="fieldset__content">
+                <div class="fieldset__row list--cell-4">{% for lang_key, language_option in language_options %}{% for country in region.countries %}{% if language_option.name == country %}<div class="field__item list__item">
+              <div class="option">
+				<input type="checkbox" id="country-{{ lang_key }}" name="delivery_settings[{{ row }}][countries][]" value="{{ lang_key }}" {{ ((delivery_settings[ row ]['countries'] and lang_key in delivery_settings[ row ]['countries']) or user.locale == lang_key) ? 'checked' : '' }}>
+				<label for="country-{{ lang_key }}">{{ language_option.name }}</label>
+			  </div>
+			  </div>{% endif %}{% endfor %}{% endfor %}</div>
+            </div>
+        </div>
+        {% set row = row+1 %}
+        {% endfor %}
+        <div class="form__total">
+          {{ form_submit(__('Save Changes'), {'class' : 'btn btn--big btn--accent'}) }}
+        </div>
+        {{ form_close() }}
+    </main>
+{% endblock %}

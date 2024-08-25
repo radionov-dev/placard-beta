@@ -1,0 +1,34 @@
+.group{
+	display: inline-block;
+	vertical-align: middle;
+	margin-right: 12px;
+	& *:first-child{
+		padding-right: 8px;
+	}
+}
+
+.group__major,
+.group__minor{
+	display: inline-block;
+	font-size: 14px;
+	@include media(custom, 0px, 920px) {
+		font-size: 12px;
+	}
+}
+.group__major{
+	color: $color-text;
+}
+.group__minor{
+	color: $color-minor;
+}
+.group--accent{
+	.group__major{
+		color: $color-accent;
+	}
+}
+.group--equal{
+	.group__major,
+	.group__minor{
+		color: $color-text;
+	}
+}

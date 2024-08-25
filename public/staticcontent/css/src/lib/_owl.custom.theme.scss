@@ -1,0 +1,40 @@
+.owl-carousel{
+	position: relative;
+}
+.owl-nav{
+	position: absolute;
+	font-size: 0;
+	right: 0;
+	top: -43px;
+}
+.owl-prev,
+.owl-next{
+	display: inline-block;
+	width: 9px;
+	height: 17px;
+	background-image: url(/staticcontent/img/icon/arrow-slider.png);
+	background-size: 19px 34px;
+	background-repeat: no-repeat;
+}
+
+
+.owl-prev{
+	background-position: -10px -17px;
+	margin-right: 15px;
+}
+.owl-next{
+	background-position: -10px 0px;
+}
+.disabled{
+	&.owl-prev{
+		background-position: 0px 0px;
+	}
+	&.owl-next{
+		background-position: 0px -17px;
+	}
+}
+
+
+.fotorama__wrap{
+	margin: 0 auto;
+}

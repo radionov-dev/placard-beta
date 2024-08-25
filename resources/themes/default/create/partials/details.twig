@@ -1,0 +1,66 @@
+        <div class="fieldset">
+            <h3 class="fieldset__title">{{ __("Title") }}</h3>
+            <div class="fieldset__content">
+                <div class="fieldset__row">
+                    <div class="field">
+                        <div class="field__item">
+            {{ form_text('title', null, {'class' : 'input'}) }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="fieldset">
+            <h3 class="fieldset__title">{{ __("Subtitle") }}</h3>
+            <div class="fieldset__content">
+                <div class="fieldset__row">
+                    <div class="field">
+                        <div class="field__item">
+            {{ form_text('subtitle', null, {'class' : 'input'}) }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="fieldset">
+            <h3 class="fieldset__title">{{ __("Description") }}</h3>
+            <div class="fieldset__content">
+                <div class="fieldset__row">
+                    <div class="field">
+                        <div class="field__item">
+            {{ form_textarea('description', null, {'class' : 'textarea'}) }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="fieldset">
+            <h3 class="fieldset__title">{{ __("Tags") }}</h3>
+            <div class="fieldset__content">
+                <div class="fieldset__row">
+                    <div class="field">
+                        <div class="field__item">
+            {{ form_text('tags_string', null, {'class' : 'input', 'placeholder': 'tag,another one'}) }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+		<div class="fieldset">
+			<h3 class="fieldset__title">{{ __('Listing ends at') }} <small class="text-muted">({{ __("Leave empty for no end date") }})</small></h3>
+            <div class="fieldset__content">
+                <div class="fieldset__row">
+                    <div class="field">
+                        <div class="field__item">
+			{{ form_text('ends_at', null, {'class' : 'input', 'placeholder': 'YYYY-MM-DD'}) }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+		</div>
+
+        {{ form_hidden('location', null, {'class' : 'input', 'id' : 'location'}) }}
+            {{ form_hidden('city', null, {'class' : 'input', 'id' : 'city'}) }}
+            {{ form_hidden('country', null, {'class' : 'input', 'id' : 'country'}) }}
+            {{ form_hidden('lat', null, {'class' : 'input', 'id' : 'lat'}) }}
+            {{ form_hidden('lng', null, {'class' : 'input', 'id' : 'lng'}) }}

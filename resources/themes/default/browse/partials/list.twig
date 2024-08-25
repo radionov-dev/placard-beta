@@ -1,0 +1,54 @@
+{% for item in listings %}
+<div class="catalog__item">
+	<div class="catalogCard">
+        {% if item.spotlight %}
+        <div class="ribbon"><span>{{ __("FEATURED") }}</span></div>
+        {%  endif %}
+		<div class="catalogCard__pic">
+            <a href="{{item.url}}" ><img class=" catalogCard__img" ssrc="/images/ajax-loader.gif" src="{{ item.thumbnail }}?w=400&h=400" alt="{{item.title}}"></a>
+		</div>
+		<div class="catalogCard__data">
+			<a href="{{item.url}}" class="catalogCard__title">{{item.title}}</a>
+            <p>{{ item.short_description | raw}}</p>
+			<div class="catalogCard__params">
+                <div class="catalogCard__param group">
+                  <!--div class="group__minor">Deal type:</div-->
+					<div class="group__major">{{item.pricing_model.name}}{%  if item.is_return %}<span title="{{ __('Return for any reason') }}" style="padding: 0">🪃</span>{% endif %}</div>
+					{% set filter_name = '' %}
+				{% if filters %}
+				{% for filter in filters %}
+					{% if filter.field == 'shipping' and item.meta[filter.field] is defined and item.meta[filter.field] is not null %}
+							{% if filter.form_input_meta.values is iterable %}{% set i=0 %}
+								{% set break = false %}
+								{% for option in filter.form_input_meta.values if not break %}
+									{% if option.value in item.meta[filter.field] %}
+										{% if option.value == 1 or option.value == 3 or (option.value == 2 and item.user.country == current_locale()) or (option.value == 4 and item.user.country != current_locale()) %}
+										{% set filter_name = _l(option.label) %}
+										{% if option.value == 2 %}{% set break = true %}{% endif %}
+										{% endif %}
+										{% set i=i+1 %}{% endif %}
+								{% endfor %} {% else %}{{ item.meta[filter.field] }}{% endif %}
+
+					{% endif %}
+				{% endfor %}
+					{% if filter_name %}
+					<div class="group__major">/&nbsp;</div> <div class="group__major">{{ filter_name }}&nbsp;</div>
+					{% endif %}
+				{% endif %}
+				</div>
+				<div class="catalogCard__param group">
+					<a href="{{item.url}}#profile-reviews" class="group__minor">{{ item.comments|length }} {{ __('comment(s)') }}</a>
+				</div>
+			</div>
+		</div>
+		<div class="catalogCard__total">
+			<div class="catalogCard__price">
+				{% set item_price = item.price_updated %}
+				<div class="catalogCard__priceFrom">{{ (item.price_in_btc ? format_btc(item.btc_price, 'BTC') : format_btc(item_price, item.currency)) | raw }}</div>
+				<div class="catalogCard__priceTo">{% if current_currency() != 'USD' %}{{ format_usd(item_price, item.currency) }}{% endif %}{% if current_currency() != 'BTC' and current_currency() != 'USD' %} / {% endif %}{% if current_currency() != 'BTC' %}{{ format_to_money(item_price, item.currency, current_currency()) }}{% endif %}</div>
+			</div>
+		</div>
+	</div>
+</div>
+{% endfor %}
+{{ listings.appends(request().query()).links() | raw }}

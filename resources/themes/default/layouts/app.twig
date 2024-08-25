@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="{{ current_locale() }}">
+<head>
+    <meta charset="utf-8">
+    <title>{{ MetaTag.get('title') }}</title>
+
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- CSRF Token -->
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
+    {{  MetaTag.tag('description') | raw }}
+	{{  MetaTag.tag('keywords') | raw }}
+    {{  MetaTag.tag('image') | raw }}
+
+    <meta name="theme-color" content="#ffffff">
+    <!-- Scripts -->
+
+	{% if setting('favicon_url') %}
+		<link rel="shortcut icon" type="image/png" href="{{ setting('favicon_url', '../../logo.png') }}"/>
+    {% endif %}
+
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('apple-touch-icon.png') }}">
+    <link rel="icon" type="image/png" href="{{ asset('favicon-32x32.png') }}" sizes="32x32">
+    <link rel="icon" type="image/png" href="{{ asset('favicon-16x16.png') }}" sizes="16x16">
+    <link rel="manifest" href="{{ asset('manifest.json') }}">
+    <link rel="mask-icon" href="{{ asset('safari-pinned-tab.svg') }}" color="#5bbad5">
+    {% if MetaTag.get('rss') %}
+    <link rel="alternate" type="application/atom+xml" title="News" href="{{ MetaTag.get('rss') }}" />
+    {% endif %}
+
+    <!-- Styles -->
+	{% set styles = jsdeliver_combine("default", "css")|split(',') %}
+    {% for style_href in styles %}
+    <link href="https://cdn.jsdelivr.net/{{style_href}}" rel="stylesheet"/>
+    {% endfor %}
+
+	<link rel="stylesheet" href="{{ asset('staticcontent/css/style.css') }}">
+    <!--[if lte IE 9]><link rel="stylesheet" href="{{ asset('staticcontent/css/ie.css') }}"><![endif]-->
+
+    <script src="{{ asset('jscore/jquery.min.js') }}"></script>
+    <script src="{{ asset('jscore/pace.min.js') }}"></script>
+    <script src="{{ asset('jscore/jquery.base64.js') }}"></script>
+
+    <style>
+        .alert {
+            position: relative;
+            padding: 0.75rem 1.25rem;
+            margin-bottom: 1rem;
+            border: 1px solid transparent;
+            border-radius: 0.25rem;
+        }
+
+        .alert-heading {
+            color: inherit;
+        }
+
+        .alert-link {
+            font-weight: 700;
+        }
+
+        .alert-dismissible {
+            padding-right: 3.8125rem;
+        }
+
+        .alert-dismissible .close {
+            position: absolute;
+            top: 0;
+            right: 0;
+            padding: 0.75rem 1.25rem;
+            color: inherit;
+        }
+
+        .alert-primary {
+            color: #004085;
+            background-color: #cce5ff;
+            border-color: #b8daff;
+        }
+
+        .alert-primary hr {
+            border-top-color: #9fcdff;
+        }
+
+        .alert-primary .alert-link {
+            color: #002752;
+        }
+
+        .alert-secondary {
+            color: #383d41;
+            background-color: #e2e3e5;
+            border-color: #d6d8db;
+        }
+
+        .alert-secondary hr {
+            border-top-color: #c8cbcf;
+        }
+
+        .alert-secondary .alert-link {
+            color: #202326;
+        }
+
+        .alert-success {
+            color: #155724;
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+        }
+
+        .alert-success hr {
+            border-top-color: #b1dfbb;
+        }
+
+        .alert-success .alert-link {
+            color: #0b2e13;
+        }
+
+        .alert-info {
+            color: #0c5460;
+            background-color: #d1ecf1;
+            border-color: #bee5eb;
+        }
+
+        .alert-info hr {
+            border-top-color: #abdde5;
+        }
+
+        .alert-info .alert-link {
+            color: #062c33;
+        }
+
+        .alert-warning {
+            color: #856404;
+            background-color: #fff3cd;
+            border-color: #ffeeba;
+        }
+
+        .alert-warning hr {
+            border-top-color: #ffe8a1;
+        }
+
+        .alert-warning .alert-link {
+            color: #533f03;
+        }
+
+        .alert-danger {
+            color: #721c24;
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+        }
+
+        .alert-danger hr {
+            border-top-color: #f1b0b7;
+        }
+
+        .alert-danger .alert-link {
+            color: #491217;
+        }
+
+        .alert-light {
+            color: #818182;
+            background-color: #fefefe;
+            border-color: #fdfdfe;
+        }
+
+        .alert-light hr {
+            border-top-color: #ececf6;
+        }
+
+        .alert-light .alert-link {
+            color: #686868;
+        }
+
+        .alert-dark {
+            color: #1b1e21;
+            background-color: #d6d8d9;
+            border-color: #c6c8ca;
+        }
+
+        .alert-dark hr {
+            border-top-color: #b9bbbe;
+        }
+
+        .alert-dark .alert-link {
+            color: #040505;
+        }
+        .alert > .close{
+            display: none;
+        }
+        .group .dealCard__price *:first-child{
+            padding: 0;
+        }
+    </style>
+	{% if setting('snippet_header') %}
+		{{ setting('snippet_header') | raw }}
+	{% endif %}
+</head>
+<body data-turbolinks="false" id="app">
+    {% block navbar %}
+        {% include 'layouts.navbar.twig' %}
+    {% endblock %}
+
+    {% block search_bar %}{% endblock %}
+
+    <div class="content " id="main" >
+        {% block content %}{% endblock %}
+    </div>
+
+
+{% block footer %}
+    {% include 'layouts.footer.twig' %}
+{% endblock %}
+
+{% block modals %}
+    {% include 'layouts.modals.twig' %}
+{% endblock %}
+
+
+    <script src="{{ asset('staticcontent/js/scripts.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/intercooler@1.2.1/dist/intercooler.min.js"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.13.3/css/selectize.default.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.13.3/js/standalone/selectize.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.repeater/1.2.1/jquery.repeater.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jQuery-formBuilder/3.7.2/form-render.min.js"></script>
+
+{% block scripts %}{% endblock %}
+
+{% include 'layouts.analytics.twig' %}
+
+    <script>
+        function copy_data(containerid) {
+            var $temp = $("<textarea style='opacity: 0; height: 0'></textarea>");
+            $("body").append($temp);
+            $temp.val($.trim($("#"+containerid).text())).select();
+            document.execCommand("copy");
+            $temp.remove();
+            /*if (window.getSelection) {
+                if (window.getSelection().empty) { // Chrome
+                    window.getSelection().empty();
+                } else if (window.getSelection().removeAllRanges) { // Firefox
+                    window.getSelection().removeAllRanges();
+                }
+            } else if (document.selection) { // IE?
+                document.selection.empty();
+            }
+
+            if (document.selection) {
+                var range = document.body.createTextRange();
+                range.moveToElementText(document.getElementById(containerid));
+                range.select().createTextRange();
+                document.execCommand("copy");
+            } else if (window.getSelection) {
+                var range = document.createRange();
+                range.selectNodeContents(document.getElementById(containerid));
+                window.getSelection().addRange(range);
+                document.execCommand("copy");
+            }*/
+            jQuery('#copy-btn').text('{{ __("Copied") }}');
+        }
+    </script>
+
+{% if setting('cookie_consent_enabled') %}
+    <script>
+        window.cookieconsent.initialise({
+            container: document.getElementById("consent"),
+            palette:{
+                popup: {background: "#237afc"},
+                button: {background: "transparent", border:"#fff", text:"#fff"}
+            },
+            cookieconsent: {
+                hasTransition: false
+            },
+            content: {
+                header: '{{ __("Cookies used on the website!") }}',
+                message: '{{ __("This website uses cookies to ensure you get the best experience on our website.") }}',
+                dismiss: '{{ __("Got it!") }}',
+                allow: '{{ __("Allow cookies") }}',
+                deny: '{{ __("Decline") }}',
+                link: null,
+                href: null,
+                close: '&#x274c;'
+            },
+            autoOpen:true,
+            revokable:false,
+            onStatusChange: function(status) {
+                console.log(this.hasConsented() ? 'enable cookies' : 'disable cookies');
+            },
+            law: {
+                regionalLaw: false,
+            },
+            location: false
+        });
+    </script>
+{% endif %}
+</body>
+</html>

@@ -1,0 +1,277 @@
+
+<div class="cardFull__data cardData" id="form-selector" >
+    <form method="GET" id="form-widget" class="checkout-form" ic-get-from="{{ url_current() }}" ic-target="#form-selector" ic-select-from-response="#form-selector" ic-replace-target="false" ic-trigger-on="change" ic-push-url="true" ic-indicator=".widget-indicator">
+
+        {% if listing.variant_options %}
+            {% for name,variation in listing.variant_options %}
+                <div class="fieldset__row">
+                    <div class="field__title">
+                        {{ _l(name) }}
+                    </div>
+                    <div class="field__item">
+                        {{  form_select('variant['~name~']', {'' : __(' - Select - ')} + array_combine(variation, variation), input_get('variant.'~name), {'class' : 'input', 'required':'required'}) }}
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+        <div class="cardData__item cardTable">
+					<div class="cardTable__header">
+						<div class="cardTable__cell">{{ __('Name') }}</div>
+						<div class="cardTable__cell">{{ __('Price') }}</div>
+						<div class="cardTable__cell">{{ __('Qantity') }}</div>
+					</div>
+            <div class="cardTable__row dd-line">
+	<div class="cardTable__cell">-</div>
+	<div class="cardTable__cell">{{ format_to_money(listing.price, listing.currency, current_currency()) }}</div>
+	<div class="cardTable__cell">
+        {% if listing.stock >= 1 %}
+                    {{ form_select('quantity', array_combine(range(1, listing.stock), range(1, listing.stock)), input_get('quantity'), {'required':'required'}) }}
+        {% else %}
+            0
+            {{ form_hidden('quantity', 1) }}
+        {% endif %}
+    </div>
+    </div>
+        </div>
+        {% endif %}
+
+        {% if error %}
+        <p class="mb-1 mt-1 p-3 text-muted text-center">{{ error }}</p>
+        {% endif %}
+
+
+        {% if listing.shipping_options|length > 0 %}
+            {% set shipping_length = listing.shipping_options|length %}
+
+            {% for filter in listing.def_filters %}
+                {% if filter.field == 'shipping' and listing.meta[filter.field] and filter.form_input_meta.values is iterable  %}
+                    {% for option in filter.form_input_meta.values %}
+                        {% if option.value in listing.meta[filter.field] %}
+                            {% set break = false %}
+                            {% for k, shipping_option in listing.shipping_options if not break %}
+                                {% if shipping_option.is_default == option.value %}
+                                    {% set break = true %}
+                                {% endif %}
+                            {% endfor %}
+
+                            {% if break %}
+                                {% if option.value == 1 %}
+                                    {% for k, shipping_option in listing.shipping_options  %}
+                                    {% if shipping_option.is_default == option.value %}
+        <div class="cardTable__row" style="display: none">
+                    <div class="cardTable__cell">
+                        <input class="form-check-input" required id="shipping_option_{{ shipping_option.id }}" checked=checked name="shipping_option" type="radio" value="{{ shipping_option.id }}">
+                        <label class="form-check-label" for="shipping_option_{{ shipping_option.id }}">
+                                {{ shipping_option.name }}
+                        </label>
+                    </div>
+            </div>
+                                        {% set shipping_length = shipping_length-1 %}
+                                    {% endif %}
+                                    {% endfor %}
+                                {% elseif ((option.value == 2 and listing.user.country != current_locale()) or (option.value == 4 and listing.user.country == current_locale())) %}
+                                    {% set shipping_length = shipping_length-1 %}
+                                {% elseif (option.value == 2 and listing.user.country == current_locale()) or (option.value == 4 and listing.user.country != current_locale()) or option.value != 2 %}
+                                <div class="cardData__title">{{ _l(option.label) }}</div>
+                                <div class="cardData__item">
+        <div class="cardTableOverfollow">
+            <div class="cardTable cardTable--2">
+                {% if option.value != 2 %}<div class="cardTable__header">
+                    <div class="cardTable__cell">{{ __('Shipping type') }}</div>
+                    <div class="cardTable__cell">{{ __('Price') }}, {{ current_currency() }}</div>
+                    <div class="cardTable__cell">{{ __('Delivery time') }}</div>
+                </div>{% endif %}
+                {% set _row_ = 0 %}
+                {% for k, shipping_option in listing.shipping_options  %}
+                    {% if shipping_option.is_default == option.value %}
+                        <div class="cardTable__row" id="shipping_id{{ shipping_option.id }}" data-price="{{ shipping_option.price }}">
+                    <div class="cardTable__cell">
+                        <input class="form-check-input" required id="shipping_option_{{ shipping_option.id }}" {{ (input_get('shipping_option') == shipping_option.id)?'checked=checked':'' }} name="shipping_option" type="radio" value="{{ shipping_option.id }}">
+                        <label class="form-check-label" for="shipping_option_{{ shipping_option.id }}">
+                                {{ (option.value == 2) ? __('Location: ') : "" }}{{ shipping_option.name }}
+                        </label>
+                    </div>
+                    {% if option.value != 2 %}<div class="cardTable__cell">{{ (shipping_option.price > 0) ? format_to_money(shipping_option.price, listing.currency, current_currency()) : '0' }}</div>{% endif %}
+                    {% if option.value != 2 %}<div class="cardTable__cell">{{ (shipping_option.is_default != 1 and shipping_option.days > 0) ? shipping_option.days ~  __(' day(s)') : '' }}</div>{% endif %}
+                </div>
+                        {% set shipping_length = shipping_length-1 %}
+                    {% endif %}
+                    {% set _row_ = _row_+1 %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+                            {% endif %}
+                            {% endif %}
+
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+            {% endfor %}
+{% if shipping_length > 1 %}
+            <div class="cardData__title">{{ __('Shipping') }}</div>
+            <div class="cardData__item">
+        <div class="cardTableOverfollow">
+            <div class="cardTable cardTable--2">
+                <div class="cardTable__header">
+                    <div class="cardTable__cell">{{ __('Shipping type') }}</div>
+                    <div class="cardTable__cell">{{ __('Price') }}, {{ current_currency() }}</div>
+                    <div class="cardTable__cell">{{ __('Delivery time') }}</div>
+                </div>
+                {% set _row_ = 0 %}
+                {% for k, shipping_option in listing.shipping_options  %}
+                    {% if not shipping_option.is_default %}
+                        <div class="cardTable__row" data-price="{{ shipping_option.price }}">
+                    <div class="cardTable__cell">
+                        <input class="form-check-input" required id="shipping_option_{{ shipping_option.id }}" {{ (input_get('shipping_option') == shipping_option.id)?'checked=checked':'' }} name="shipping_option" type="radio" value="{{ shipping_option.id }}">
+                        <label class="form-check-label" for="shipping_option_{{ shipping_option.id }}">
+                                {{ shipping_option.name }}
+                        </label>
+                    </div>
+                    <div class="cardTable__cell">{{ (shipping_option.price > 0) ? format_to_money(shipping_option.price, listing.currency, current_currency()) : '0' }}</div>
+                    <div class="cardTable__cell">{{ (shipping_option.is_default != 1 and shipping_option.days > 0) ? shipping_option.days ~  __(' day(s)') : '' }}</div>
+                </div>
+                    {% endif %}
+                    {% set _row_ = _row_+1 %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+        {% endif %}
+        {% endif %}
+
+
+
+
+        {% if listing.additional_options|length > 0 %}
+            <div class="row mt-3 mb-3">
+                <div class="col-sm-12">
+                    <label class="small text-muted">{{ __('Additional options') }}</label>
+                    {% for k, additional_option in listing.additional_options  %}
+                        <div class="form-check">
+
+                            <input class="form-check-input" id="additional_option_{{ additional_option.id }}" {{ (input_has('additional_option.'~additional_option.id))?'checked=checked':'' }} name="additional_option[{{ additional_option.id }}]" type="checkbox" value="1">
+                            <label class="form-check-label" for="additional_option_{{ additional_option.id }}">
+                                {{ additional_option.name }} <span class="text-muted">({{ format_to_money(additional_option.price, listing.currency, current_currency()) }})</span>
+                            </label>
+
+                            {% if additional_option.max_quantity > 1 and input_has('additional_option.' ~ additional_option.id) %}
+                                {{ form_select('additional_options_meta['~additional_option.id~'][quantity]', array_combine(range(1, additional_option.max_quantity), range(1, additional_option.max_quantity)), input_get("additional_options_meta."~ additional_option.id ~ ".quantity"), {'class' : 'input'}) }}
+                                <br />
+                            {% endif %}
+
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+
+        {%  if total %}
+        <div class="cardData__total">
+                        {% if service_fee > 0 %}
+                            <p class="catalogCard__priceTo">{{ __("Service Fee") }}: {{ format_to_money(service_fee, listing.currency, current_currency()) }}</p>
+                        {% endif %}
+					<div class="cardData__price"><small>
+                            {% if total_btc and listing.price_in_btc %}
+                               {{ format_btc(total_btc, 'BTC') | raw }}
+                            {% else %}
+                            {{ format_btc(total, listing.currency) | raw }}
+                            {% endif %}
+                        </small> <i class="widget-indicator fa fa-circle-o-notch p-1 fa-spin float-right" style="display:none"></i></div>
+            {% if listing.user.can_accept_payments and listing.stock >= 1  %} {# and auth_check() #}
+            <button type="submit" {{ error?'disabled':'' }} class="cardData__btn" formaction="{{ route('checkout', { 'listing': listing  } ) }}"> {{ __("BUY IT NOW") }} </button>
+            {% elseif auth_check() %}
+            <a href="{{ route('inbox.create', {'user_id': listing.user_id, 'direct':true, 'listing_id':listing.id}) }}" class="cardData__btn">{{ __("Ask about availability") }} </a>
+            {% else %}
+            <a href="{{route('login', {'action' : 'checkout'})}}" class="cardData__btn">{{ __("BUY IT NOW") }} </a>
+{% endif %}
+				</div>
+            <p class="catalogCard__priceTo">{{ format_to_money(total, listing.currency, current_currency()) }}{% if current_currency() != 'USD' %} / {{ format_usd(total, listing.currency) }}{% endif %}</p>
+        {% endif %}
+
+        {#
+        <div class="total-price__block">
+            {% for item in price_items %}
+                <div class="row">
+                    <div class="col-sm-8 mt-1">
+                        <span class="head">{{ item.label }}</span>
+                        {% if item.notice %}
+                            <span class="" data-toggle="tooltip" data-placement="top" title="{{ item.notice }}"><i class="fa fa-info-circle" aria-hidden="true"></i></span>
+                        {% endif %}
+                    </div>
+                    <div class="col-sm-4 mt-1 text-right">
+                        <span>{{format_money(item.price, listing.currency)}}</span>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        #}
+
+
+    {% if listing.user.can_accept_payments  %}
+        <script>
+            var total = "{{ total }}";
+            var billingAddress =  Boolean({{ listing.pricing_model.requires_billing_address }});
+            var shippingAddress =  Boolean({{ listing.pricing_model.requires_shipping_address }});
+        </script>
+        {% if not input_get('shipping_option')  %}
+        <script>
+            window.addEventListener('load', function() {
+                let sh_price = false;
+                let sh_sel = false;
+
+                $( "*[data-price]" ).each(function( index ) {
+                    if (sh_sel === false || sh_price === false || parseFloat($(this).attr('data-price')) < sh_price) {
+                        sh_sel = $(this).attr('id');
+                        sh_price = parseFloat($(this).attr('data-price'));
+                    }
+                });
+
+                if (sh_sel) {
+                    $('#'+sh_sel).find('input[type="radio"]').prop('checked');
+                    $('#'+sh_sel).find('label').trigger('click');
+                }
+            });
+        </script>
+        {% endif %}
+    {% endif %}
+    </form>
+</div>
+
+<div class="cardFull__user">
+    <a href="{{ listing.user.url }}" class="userBlock">
+        <div class="userBlock__pic">
+            <img src="{{ listing.user.avatar }}" alt="{{ listing.user.display_name }}" class="userBlock__img" />
+        </div>
+        <div class="userBlock__content">
+            <div class="userBlock__name">{{ listing.user.display_name }}</div>
+            {{ include('components.star_rating', {rating: listing.user.averageRate(), total: listing.user.totalCommentCount(), date: listing.user.created_at.format('Y.m') }) }}
+        </div>
+    </a>
+    <div class="cardFull__action">
+      <div class="cardFull__actionItem">
+		{{ listing.user.country }} {{ listing.user.city }}
+        {%  if listing.is_return %}
+            <br>Return for any reason
+        {% endif %}
+	  </div>
+
+        {% if listing.pricing_model.widget != 'request' and listing.pricing_model.widget != 'announcement' %}
+            {% if auth_check() %}
+                <div class="cardFull__actionItem">
+                    <a href="{{ route('inbox.create', {'user_id': listing.user_id, 'direct':true}) }}" class="link">{{ __("Send message") }}</a>
+                </div>
+            {% else %}
+                <div class="cardFull__actionItem">
+                    <p class="h6">{{ __('Want to contact the seller?') }}</p>
+                    <p>{{ __('Sign in to send a message.') }}</p>
+
+                    <a href="{{ route('login') }}" class="btn btn--simple">{{ __("Sign in") }}</a>
+                </div>
+            {% endif %}
+        {% endif %}
+        <div class="cardFull__actionItem">
+            <a href="{{ listing.user.url }}" class="link">Visit store</a>
+        </div>
+    </div>
+</div>

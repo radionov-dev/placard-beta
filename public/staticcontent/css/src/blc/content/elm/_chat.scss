@@ -1,0 +1,171 @@
+.chat{
+	position: absolute;
+	width: auto;
+	top: 10px;
+	bottom: 0;
+	left: $gap;
+	right: $gap;
+	border: 1px solid #ececed;
+	font-size: 0;
+	@include media(phone-phablet) {
+		right: $gap / 2;
+		left: $gap / 2;
+	}
+	@include media(phone) {
+		right: $gap / 4;
+		left: $gap / 4;
+	}
+}
+.chat__users,
+.chat__messages{
+	display: inline-block;
+	vertical-align: top;
+	font-size: 14px;
+}
+
+
+.chat__users{
+	position: absolute;
+	left: 0;
+	top: 0;
+	bottom: 0;
+	width: 350px;
+	border-right: 1px solid #ececed;
+	background-color: #fff;
+	transition: all 0.2s ease;
+	z-index: 2;
+	@include media(custom, 0px, 920px) {
+		width: 120px;
+		.chat--open &{
+			width: 350px;
+		}
+		.userList__item{
+			width: 350px;
+		}
+	}
+	@include media(phone-smartphone) {
+		width: 0;
+		border: none;
+		.chat__search{
+			margin: 0;
+		}
+		.input{
+			padding: 0;
+			transition: all 0.2s ease;
+			border: none;
+		}
+		.chat--open &{
+			width: 280px;
+			border-right: 1px solid #ececed;
+			.input{
+				padding: 10px 15px 10px 40px;
+				border: 1px solid #d9dadc;
+			}
+			.chat__search{
+				margin: -1px -1px 0;
+			}
+		}
+		.userList__item{
+			width: 280px;
+		}
+	}
+}
+.chat__toogle{
+	display: none;
+	position: absolute;
+	cursor: pointer;
+	@include media(custom, 0px, 920px) {
+		display: block;
+		right: -15px;
+		top: 300px;
+		width: 15px;
+		height: 100px;
+		border-radius: 0 20px 20px 0;
+		background-color: #ccc;
+		&:before{
+			content: "";
+			display: inline-block;
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			margin: -3px 0 0 -5px;
+			width: 10px;
+			height: 6px;
+			background-image: url(/staticcontent/img/icon/arrow-white-smal-down.png);
+			transform: rotate(-90deg);
+			background-size: 10px 6px;
+			background-position: center;
+		}
+		transition: transform 0.2s ease-out;
+		.chat--open &:before{
+			transform: rotate(90deg);
+		}
+	}
+}
+.chat__search{
+	margin: -1px -1px 0;
+}
+.userList{
+	overflow-y: auto;
+	overflow-x: hidden;
+	height: calc(100% - 50px);
+	
+}
+.userList__item{
+	border-top: 1px solid #ececed;
+	padding: 15px 0 20px 20px;
+	cursor: pointer;
+	transition: all 0.2s ease;
+	&:first-child{
+		border-top: none;
+	}
+	&:hover{
+		background-color: #f8f8f8;
+	}
+	&.active {
+		background-color: #f8f8f8;
+	}
+}
+.chat__messages{
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	right: 0;
+	left: 350px;
+	background-color: #fafbfb;
+	@include media(custom, 0px, 920px) {
+		left: 120px;
+	}
+	@include media(phone-smartphone) {
+		left: 0;
+	}
+}
+.messagesList{
+	position: absolute;
+	height: calc(100% - 230px);
+	bottom: 230px;
+	width: 100%;
+	overflow-y: auto;
+}
+.messages__item{
+	padding: 15px 0 20px 20px;
+}
+.messages__item--my{
+	background-color: #f5f6f6;
+}
+.messagesNew{
+	position: absolute;
+	bottom: 0;
+	right: 0;
+	left: 0;
+	padding: 35px 30px 30px;
+	background-color: #f5f6f6;
+}
+.messagesNew__total{
+	margin-top: 15px;
+	width: 100%;
+	text-align: right;
+}
+.messagesNew__text{
+	resize: none;
+}

@@ -1,0 +1,528 @@
+{% extends "account.master" %}
+
+{% block user_area %}
+    <main class="content__main">
+        {% include 'notifications' %}
+        <div class="dealDetail">
+            <div class="dealDetail__header">
+                <div class="dealCard dealCard--{% if auth_check() and order.seller_id == auth_user().id %}sale{% else %}buy{% endif %}">
+                    <a href="{{route('listing', {'id' : order.listing, 'slug' : str_slug(order.listing.title)})}}" class="dealCard__pic" style="overflow: hidden;">
+                        <img src="{{ order.listing.thumbnail }}" alt="{{ order.listing.title }}" class="dealCard__img" />
+                    </a>
+                    <div class="dealCard__data">
+                        <h1 class="dealCard__title"><a href="{{route('listing', {'id' : order.listing, 'slug' : str_slug(order.listing.title)})}}">{{ order.listing.title }}</a>
+                      {%if order.getAttribute('listing_data') %}<a href="{{ route('account.orders.snapshot', order) }}" class="badge badge-info product__value">{{ __('Snapshot') }}</a>{%endif%}
+                      </h1>
+                        <div class="dealCard__params">
+                            <div class="dealCard__param group">
+                                <div class="group__minor">{{ order.listing.subtitle }}</div>
+                            </div>
+
+                            {% if order.user_choices|length %}
+                            <div class="dealCard__param">
+                                <div class="group__minor">{{ __('User choices') }}:</div>
+                                <div class="group__major dealCard__price">{% for choice in order.user_choices %}
+                                        {{ choice.name|capitalize }}: {{ choice.value }}<br />
+                                    {% endfor %}</div>
+                            </div>
+                            {% endif %}
+                            <div class="dealCard__param group">
+                                <div class="group__minor">{{ __('Deal price') }}:</div>
+                                <div class="group__major dealCard__price">{%if order.getAttribute('btc_payment_sum') %}{{  format_btc(order.getAttribute('btc_payment_sum'), 'btc') | raw }} / {% endif %}{{ format_to_money(order.amount, order.currency, current_currency()) }}</div>
+                            </div>
+                            <div class="dealCard__param">
+                                <div class="group__minor">{{ __('Deal type') }}:</div>
+                                <div class="group__major">{{order.getAttribute('bd_type') ? order.getAttribute('bd_type') : order.listing.pricing_model.name}}</div>
+                            </div>
+                            {% if shipping %}
+                            <div class="dealCard__param">
+                                <div class="group__minor">{{ __('Shipping') }}:</div>
+                                <div class="group__major">{{ shipping }}</div>
+                            </div>
+                            {% endif %}
+                            <div class="dealCard__param group">
+                                <div class="group__minor">{{ __('Order date') }}:</div>
+                                <div class="group__major">{{ order.created_at.format('Y.m.d')  }}</div>
+                            </div>
+                            {% if order.getAttribute('end_timestamp') %}
+                            <div class="dealCard__param group">
+                                <div class="group__minor">{{ __('End') }}:</div>
+                                <div class="group__major">{{ order.getAttribute('end_timestamp')|date('Y.m.d')  }}</div>
+                            </div>
+                            {% endif %}
+                            <div class="block">
+                                {% if order.status == 'declined' %}
+                                    <div class="dealCard__param group group--equal">
+                                        <div class="group__minor">{{ __('Declined at') }}:</div>
+                                        <div class="group__major">{{ order.declined_at.toFormattedDateString() }}</div>
+                                    </div>
+                                {% endif %}
+
+                                {% if order.status != 'open' and order.accepted_at %}
+                                    <div class="dealCard__param group group--equal">
+                                        <div class="group__minor">{{ __('Accepted at') }}:</div>
+                                        <div class="group__major">{{ order.accepted_at.toFormattedDateString() }}</div>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% if auth_check() and order.seller_id == auth_user().id %}
+                        <div class="dealCard__user">
+                            <a href="{{ order.user.url }}" class="userBlock">
+                                <div class="userBlock__pic">
+                                    <img src="{{ order.user.avatar }}" alt="{{ order.user.display_name }}" class="userBlock__img" />
+                                </div>
+                                <div class="userBlock__content">
+                                    <div class="userBlock__name">{{ order.user.display_name }}</div>
+                                    {{ include('components.star_rating', {rating: order.user.averageRate(), total: order.user.totalCommentCount(), date: order.user.created_at.format('Y.m') }) }}
+                                </div>
+                            </a>
+                        </div>
+                    {% endif %}
+                        {% if auth_check() and order.seller_id != auth_user().id %}
+                        <div class="dealCard__user">
+                            <a href="{{ order.seller.url }}" class="userBlock">
+                                <div class="userBlock__pic">
+                                    <img src="{{ order.seller.avatar }}" alt="{{ order.seller.display_name }}" class="userBlock__img" />
+                                </div>
+                                <div class="userBlock__content">
+                                    <div class="userBlock__name">{{ order.seller.display_name }}</div>
+                                    {{ include('components.star_rating', {rating: order.seller.averageRate(), total: order.seller.totalCommentCount(), date: order.seller.created_at.format('Y.m') }) }}
+                                </div>
+                            </a>
+                        </div>
+                        {% endif %}
+                    <div class="dealCard__total">
+                        <span class="deal-status deal-status--{% if order.status == 'dispute' or order.status == 'declined' %}fail{% else %}ok{% endif %}">{{ order.status }}</span>
+
+                        {% if order.status == 'open' and order.payment_address and order.payment_until and order.payment_until.timestamp >= date().timestamp and btc_payment_is %}
+                        <span class="deal-status deal-status--major">{{ __('Pending transaction confirmation') }}</span>
+                        {% endif %}
+
+                        {% if (order.status == 'completed' or order.status == 'paid' or order.status == 'shipped') and order.user_id == auth_user().id and not order.comments.count()  %}
+                        <a href="{{ route('account.orders.feedback', order) }}" class="btn btn--smal btn--accent">{{ __('Leave feedback') }}</a>
+                        {% endif %}
+                        {% if (((order.getAttribute('bd_type') == 'postpayment' or order.getAttribute('bd_type') == 'mediation') and (order.status == 'paid' or order.status == 'shipped') and order.user_id == auth_user().id) or order.status == 'dispute' and order.seller_id == auth_user().id) and not order.comments.count()  %}
+                        <a href="{{ route('account.orders.dispute', order) }}" class="btn btn--smal">{{ __('Open Dispute') }}</a>
+                        {% endif %}
+                        {% if (not (order.status == 'completed' or order.status == 'dispute' or order.status == 'shipped' or order.status == 'declined') and (order.seller_id == auth_user().id or is_mediator)) %}
+                            <button onclick="jQuery('#cancel_form,.popup_back').show();" type="button" class="btn btn--outline btn--smal">{{ __('Cancel deal') }}</button>
+                        {% endif %}
+                        {% if (order.status == 'paid' and (order.seller_id == auth_user().id  or is_mediator)) %}
+                            <button type="button" onclick="jQuery('#shipped_form,.popup_back').show();" class="btn btn--outline btn--outline btn--smal">{{ __('Shipped') }}</button>
+                        {% endif %}
+                        {% if is_mediator %}
+                            <button type="button" onclick="jQuery('#moder_form,.popup_back').show();" class="btn btn--outline btn--outline btn--smal">{{ __('Mediator form') }}</button>
+                        {% endif %}
+                    </div>
+                    <div class="dealDetail__content cardFull__actionItem" style="margin-top: 20px">
+                        <div class="contentNav__title {% if order.status == 'open' and order.payment_address and order.payment_until and order.payment_until.timestamp >= date().timestamp and order.user_id == auth_user().id %}active{% endif %}">
+                          <a href="javascript:void(0);" onclick="$('#payment_bl').slideToggle('slow');$(this).parent().toggleClass('active');" class="contentNav__link">{{ __('Payment') }}</a>
+                        </div>
+                        <div class="dealCard__params" id="payment_bl" style="{% if order.status == 'open' and order.payment_address and order.payment_until and order.payment_until.timestamp >= date().timestamp and order.user_id == auth_user().id %}{% else %}display: none;{% endif %}">
+                            <div class="dealCard__param group">
+                                <div class="group__minor">{{ __('Deal price') }}:</div>
+                                <div class="group__major dealCard__price">{%if order.getAttribute('btc_payment_sum') %}{{  format_btc(order.getAttribute('btc_payment_sum'), 'btc') | raw }} / {% endif %}{{ format_to_money(order.amount, order.currency, current_currency()) }}</div>
+                            </div>
+                            {% if auth_check() and order.seller_id == auth_user().id and order.service_fee > 0 %}
+                                <div class="dealCard__param group">
+                                <div class="group__minor">{{ __('Marketplace Fee') }}:</div>
+                                <div class="group__major dealCard__price">{{ format_to_money(order.service_fee, order.currency, current_currency()) }}</div>
+                            </div>
+                            {% endif %}
+                            {% if order.payment_until and order.status == 'open' %}
+                            <div class="dealCard__param">
+                                <div class="group__minor">{{ __('Payment until') }}:</div>
+                                <div class="group__major">{{ order.payment_until.format('Y.m.d')  }}</div>
+                            </div>
+                            {% endif %}
+                            {% if order.status == 'open' and order.payment_address and order.payment_until and order.payment_until.timestamp >= date().timestamp and order.user_id == auth_user().id %}
+                            <div class="dealCard__param">
+                                <div class="group__minor">{{ __('Payment Address') }}:</div>
+                                <div class="group__major">{{ order.payment_address  }}</div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% if bs_status %}
+                    <div class="dealDetail__content cardFull__actionItem" style="margin-top: 20px">
+                        <div class="contentNav__title active">
+                            <span class="contentNav__link">{{ __('BitDeals Status') }}</span>
+                        </div>
+                        <div class="dealCard__params">
+                            <div class="dealCard__param">
+                                <div class="group__minor" style="font-family: monospace;">{{  bs_status|raw  }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% if order.getAttribute('shipped_note') %}
+                    <div class="dealDetail__content cardFull__actionItem" style="margin-top: 20px">
+                        <div class="contentNav__title active">
+                            <span class="contentNav__link">{{ __('Shipped Information') }}</span>
+                        </div>
+                        <div class="dealCard__params">
+                            <div class="dealCard__param">
+                                <div class="group__minor">{{  order.getAttribute('shipped_note')  }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    <div class="dealDetail__content">
+                        {% set dispute_user_info =  order.getAttribute('dispute_user_info') %}
+                        {% set dispute_seller_info =  order.getAttribute('dispute_seller_info') %}
+                        {% if dispute_user_info %}
+                        <h3 class="dealCard__title">{{ __('Dispute Details') }}</h3>
+                        <div class="dealCard__params">
+                            <div class="dealCard__param">
+                                <div class="group__minor">{{ __('Dispute Reason') }}:</div>
+                                <div class="group__major">
+                                    {% if dispute_user_info.reason == 1 %}
+                                        {{ __('Return for any reason') }}
+                                    {% elseif dispute_user_info.reason == 2  %}
+                                        {{ __('I haven’t received my order') }}
+                                    {% elseif dispute_user_info.reason == 3 %}
+                                        {{ __('The item Quality issues') }}
+                                    {% endif %}
+
+                                        {% if dispute_user_info.problem == 'tracking' %}
+                                          -  {{ __('No tracking information') }}
+                                        {% elseif dispute_user_info.problem == 'dlivery_time' %}
+                                          -  {{ __('Delivery time is running out, but package is still in transit') }}
+                                        {% elseif dispute_user_info.problem == 'wrong_address' %}
+                                          -  {{ __('Package sent to a wrong address') }}
+                                        {% elseif dispute_user_info.problem == 'returned' %}
+                                          -  {{ __('Package was returned to seller by shipping company') }}
+                                        {% elseif dispute_user_info.problem == 'described' %}
+                                          -  {{ __('Item not as described') }}
+                                        {% elseif dispute_user_info.problem == 'damaged' %}
+                                          -  {{ __('Damaged item') }}
+                                        {% elseif dispute_user_info.problem == 'quantity' %}
+                                          -  {{ __('Quantity Shortage') }}
+                                        {% endif %}
+                                </div>
+                            </div>
+                            <div class="dealCard__param">
+                                <div class="group__minor">{{ __('Proposal') }}:</div>
+                                <div class="group__major">
+                                    {% if dispute_user_info.proposal == 1 %}
+                                        {{ __('Return and Refund') }}
+                                    {% elseif dispute_user_info.proposal == 2  %}
+                                        {{ __('Full Refund') }}
+                                    {% elseif dispute_user_info.proposal == 3 %}
+                                        {{ __('Partial Refund') }}
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% if dispute_user_info.notes or dispute_user_info.img_location %}
+                            <div class="dealCard__param">
+                                <div class="group__minor">{{ __('Comment') }}:</div>
+                                <div class="group__major">
+                                    {{ dispute_user_info.notes }}
+                                    {% if dispute_user_info.img_location %}
+                                        <br><a href="{{ dispute_user_info.img_location }}" target="_blank"><img src="{{ dispute_user_info.img_location }}" style="max-width: 450px; width: 100%; display: block;"></a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endif %}
+                            <div class="dealCard__param">
+                                <div class="group__minor">{{ __('Status') }}:</div>
+                                <div class="group__major">
+                                    {% if order.status == 'dispute' %}
+                                        Dispute in progress
+                                    {% else %}
+                                        Disput Finished
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% if not dispute_seller_info %}
+                            <div class="dealCard__param reminder">
+                                <div class="group__minor">{{ __('Reminder') }}:</div>
+                                <div class="group__major">The seller will reply within <span class="d"></span> days <span class="h"></span> hours <span class="m"></span> minutes.</div>
+                            </div>
+                            {% endif %}
+                            {% if order.getAttribute('end_timestamp') %}
+                            <div class="dealCard__param reminder2">
+                                <div class="group__minor">{{ __('Order time left') }}:</div>
+                                <div class="group__major"><span class="d"></span> days <span class="h"></span> hours <span class="m"></span> minutes.</div>
+                            </div>
+                            {% endif %}
+                            {% if dispute_seller_info %}
+                            <div class="dealCard__param">
+                                <div class="group__minor">{% if auth_check() and order.seller_id == auth_user().id %}{{ __('My Proposal') }}{% else %}{{ __('Seller Proposal') }}{% endif %}:</div>
+                                <div class="group__major">
+                                    {% if dispute_seller_info.proposal == 1 %}
+                                        {{ __('Return and Refund') }}
+                                    {% elseif dispute_seller_info.proposal == 2  %}
+                                        {{ __('Full Refund') }}
+                                    {% elseif dispute_seller_info.proposal == 3 %}
+                                        {{ __('Partial Refund') }}
+                                    {% elseif dispute_seller_info.proposal == 4 %}
+                                        {{ __('Dispute acceptable result') }}
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% if dispute_seller_info.notes or dispute_seller_info.img_location %}
+                            <div class="dealCard__param">
+                                <div class="group__minor">{% if auth_check() and order.seller_id == auth_user().id %}{{ __('My Comment') }}{% else %}{{ __('Seller Comment') }}{% endif %}:</div>
+                                <div class="group__major">
+                                    {{ dispute_seller_info.notes }}
+                                    {% if dispute_seller_info.img_location %}
+                                        <br><img src="{{ dispute_seller_info.img_location }}">
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endif %}
+                            {% endif %}
+                            {% if auth_check() and order.user_id == auth_user().id %}
+                            <div class="dealCard__param reminder">
+                                <div class="group__minor">{{ __('During the dispute process you can discuss the refund terms with the seller. If you and seller can’t come to an agreement, we will step in and help. During this time, you are still free to negotiate a deal with the seller') }}</div>
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                    </div>
+            </div>
+        </div>
+        <div class="dealDetail__content">
+            <div class="comments">
+                {% if order.status != 'open' or order.seller_id == auth_user().id or is_mediator %}
+                    <div class="commentNew">
+                        <form method="PUT" class="form" action="{{ route('account.orders.update', order) }}"
+                              ic-put-to="{{ route('account.orders.update', order) }}" ic-target=".content__main"
+                              ic-select-from-response=".content__main" ic-indicator="#indicator">
+                            {{ csrf_field() }}
+                            <div class="commentNew__header">
+                                <h3 class="commentNew__title">{{ __('Message') }}</h3>
+                            </div>
+                            <div class="commentNew__content">
+                                {{ form_textarea('notes', null, {'class' : 'textarea', 'rows' : 3}) }}
+                            </div>
+                            <div class="commentNew__total">
+                                <span class="commentNew__tooltip">{{ __('Send an optional message to') }} {{ order.user.display_name }}</span>
+                                {% if order.status == 'open' and (order.seller_id == auth_user().id) %}
+                                    <button type="submit" name="status" value="accept" class="btn btn--accent btn--outline btn--smal">{{ __('Approve deal') }}
+                                </button>
+                                {% endif %}
+                                    <button type="submit" class="btn btn--accent btn--outline btn--smal">{{ __('Send') }}
+                                    </button>
+                            </div>
+
+                            <div class="progress" id="indicator" style="display:none">
+                                <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" style="width: 75%"></div>
+                            </div>
+
+                        </form>
+                    </div>
+                {% endif %}
+
+                {% for k, msg in messages %}
+                <div class="messages__item">
+                    <div class="userBlock userBlock--chat">
+                        <a href="{{msg.sender.url }}" class="userBlock__title">
+                            <div class="userBlock__pic">
+                                <img src="{{msg.sender.avatar }}" alt="{{msg.sender.name }}" class="userBlock__img" />
+                            </div>
+                            <div class="userBlock__name">{{ msg.sender.display_name }}</div>
+                        </a>
+                        <div class="userBlock__message">
+                            <div class="userBlock__date">{{msg.created_at.format('Y.m.d') }}</div>
+                            <div class="userBlock__text">{{msg.message | filter_message}}</div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+
+
+            </div>
+        </div>
+        </div>
+        <div class="popup_back" style="display:none;"></div>
+        {% if is_mediator %}
+        <div class="popup modal" id="moder_form" style="display: none;">
+        <a href="javascript://" onclick="jQuery('#moder_form,.popup_back').hide();jQuery('.positive-complete').show();jQuery('.neutral-complete').hide();" class="popup__close"></a>
+        <div class="popup__header">
+            <div class="popup__title">{{ __('Mediator form') }}</div>
+        </div>
+        <div class="popup__content">
+          <form method="PUT" class="form" action="{{ route('account.orders.update', order) }}"
+                ic-put-to="{{ route('account.orders.update', order) }}" ic-target=".content__main"
+                ic-select-from-response=".content__main" ic-indicator="#indicator">
+            {{ csrf_field() }}
+              <div class="fieldset" >
+              <div class="fieldset__content">
+                <div class="fieldset__row neutral-complete" style="display:none">
+                  <div class="field">
+                    <label class="field__title" for="notes">{{ __("Message") }}</label>
+                    <div class="field__item neutral-complete">
+                        {{ form_textarea('notes', null, {'class' : 'textarea', 'rows' : 3, 'id': 'notes', 'placeholder': __('Send an optional message to') ~ " " ~ order.user.display_name}) }}
+                    </div>
+                  </div>
+                </div>
+                <div class="fieldset__row neutral-complete" style="display:none">
+                  <div class="field">
+                    <label class="field__title" for="refund">{{ __("Refund") }}</label>
+                    <div class="field__item">
+                        <input name="refund" type="number" id="refund" class="input" min="0" max="100" step="1" placeholder="Refund Percent" >
+                    </div>
+                  </div>
+                </div>
+                <div class="form__total">
+                    <button type="button" class="btn btn--outline btn--smal neutral-complete" onclick="jQuery('.positive-complete').show();jQuery('.neutral-complete').hide();" style="display:none;">{{ __('Back') }}</button>
+                    <button type="button" class="btn btn--outline btn--smal positive-complete" onclick="jQuery('.positive-complete').hide();jQuery('.neutral-complete').show();">{{ __('Neutral Complete') }}</button>
+                    <button type="submit" name="status" value="complete_n" class="btn btn--accent btn--outline btn--smal neutral-complete" style="margin: 0;display:none">{{ __('Neutral Complete') }}</button>
+                    <button type="submit" name="status" value="complete_p" class="btn btn--accent btn--outline btn--smal positive-complete" style="margin: 0">{{ __('Positive Complete') }}</button>
+                </div>
+              </div>
+            </div>
+            <div class="progress" id="indicator" style="display:none">
+              <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" style="width: 75%"></div>
+            </div>
+          </form>
+        </div>
+        </div>
+        {% endif %}
+        {% if (not (order.status == 'completed' or order.status == 'dispute' or order.status == 'shipped') and order.seller_id == auth_user().id) or is_mediator %}
+        <div class="popup modal" id="cancel_form" style="display: none;">
+        <a href="javascript://" onclick="jQuery('#cancel_form,.popup_back,#cancel-deal-signature,#cancel_form .form__total button[type=submit]').hide();jQuery('#cancel-deal-notes,#cancel_form .form__total button[type=button]').show();" class="popup__close"></a>
+        <div class="popup__header">
+            <div class="popup__title">{{ __('Cancel deal') }}</div>
+        </div>
+        <div class="popup__content">
+          <form method="PUT" class="form" action="{{ route('account.orders.update', order) }}"
+                ic-put-to="{{ route('account.orders.update', order) }}" ic-target=".content__main"
+                ic-select-from-response=".content__main" ic-indicator="#indicator">
+            {{ csrf_field() }}
+              <div class="fieldset" >
+              <div class="fieldset__content">
+                <div class="fieldset__row" id="cancel-deal-notes">
+                  <div class="field">
+                    <label class="field__title" for="notes-cf">{{ __("Message") }}</label>
+                    <div class="field__item">
+                        {{ form_textarea('notes', null, {'class' : 'textarea', 'rows' : 3, 'id': 'notes-cf', 'placeholder': __('Send an optional message to') ~ " " ~ order.user.display_name}) }}
+                    </div>
+                  </div>
+                </div>
+                <div class="fieldset__row" id="cancel-deal-signature" style="display:none">
+                  <a class="field__title" id="copy-btn" style="float: right; margin: 0; padding: 0; text-align: right;" href="javascript://" onclick="jQuery('#info-deal-sing').text(jQuery('#signature-cf').val());copy_data('info-deal-text');">{{ __("Copy") }}</a>
+                  <div>
+                  <div class="field" id="info-deal-text"><div class="field__item">{{ order.payment_address }}</div>
+<div class="field__item" id="info-deal-notes"></div>
+<div class="field__item" id="info-deal-sing" style="opacity: 0; font-size: 0 !important; line-height: 0;"></div></div>
+                  </div>
+                  <hr>
+                  <div class="field">
+                    <label class="field__title" for="notes-cf">{{ __("BitDeals Signature") }}:</label><div class="field__item">{{ form_textarea('seller_signature', null, {'class' : 'textarea', 'rows' : 3, 'id': 'signature-cf', placeholder: __('Sign this text using your bitcoin key'), 'onchange':'jQuery(\'#info-deal-sing\').text(jQuery(this).val())'}) }}
+                    </div>
+                  </div>
+                </div>
+                <div class="form__total">
+                    <button type="button" class="btn btn--outline btn--smal" onclick="jQuery('#cancel-deal-notes,#cancel_form .form__total button[type=button]').hide();jQuery('#cancel-deal-signature,#cancel_form .form__total button[type=submit]').show();jQuery('#info-deal-notes').html(jQuery('#cancel-deal-notes #notes-cf').val().replace('\n','<br/>\n'));let ndate=new Date();jQuery('#copy-btn').text('{{ __("Copy") }}')" style="margin: 0;">{{ __('Cancel deal') }}</button>
+                    <button type="submit" name="status" value="decline" class="btn btn--outline btn--smal" style="margin: 0;display:none">{{ __('Submit') }}</button>
+                </div>
+              </div>
+            </div>
+            <div class="progress" id="indicator" style="display:none">
+              <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" style="width: 75%"></div>
+            </div>
+          </form>
+        </div>
+        </div>
+        {% endif %}
+        {% if (order.status == 'paid' and order.seller_id == auth_user().id) or is_mediator %}
+        <div class="popup modal" id="shipped_form" style="display: none;">
+        <a href="javascript://" onclick="jQuery('#shipped_form,.popup_back').hide();" class="popup__close"></a>
+        <div class="popup__header">
+            <div class="popup__title">{{ __('Shipped') }}</div>
+        </div>
+        <div class="popup__content">
+          <form method="PUT" class="form" action="{{ route('account.orders.update', order) }}"
+                ic-put-to="{{ route('account.orders.update', order) }}" ic-target=".content__main"
+                ic-select-from-response=".content__main" ic-indicator="#indicator">
+            {{ csrf_field() }}
+              <div class="fieldset" >
+              <div class="fieldset__content">
+                <div class="fieldset__row">
+                  <div class="field">
+                    <label class="field__title" for="notes-shipped">{{ __("Note") }}</label>
+                    <div class="field__item">
+                        {{ form_textarea('notes', null, {'class' : 'textarea', 'rows' : 3, 'id': 'notes-shipped' }) }}
+                    </div>
+                  </div>
+                </div>
+                <div class="form__total">
+                    <button type="submit" name="status" value="shipped" class="btn btn--outline btn--smal" style="margin: 0;">{{ __('Shipped') }}</button>
+                </div>
+              </div>
+            </div>
+            <div class="progress" id="indicator" style="display:none">
+              <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" style="width: 75%"></div>
+            </div>
+          </form>
+        </div>
+        </div>
+        {% endif %}
+    </main>
+<script>
+{% if order.status == 'dispute'%}
+{% if not dispute_seller_info %}
+let unix_timestamp = {{ order.getAttribute('dispute_user_timestamp') }};
+var end = new Date((unix_timestamp + 259200) * 1000);
+{% endif %}
+{% if order.getAttribute('end_timestamp') %}
+let unix_timestamp2 = {{ order.getAttribute('end_timestamp') }};
+var end2 = new Date(unix_timestamp2 * 1000);
+{% endif %}
+var _second = 1000;
+var _minute = _second * 60;
+var _hour = _minute * 60;
+var _day = _hour * 24;
+var timer;
+
+function showRemaining() {
+    var now = new Date();
+    var distance = end - now;
+    if (distance < 0) {
+        clearInterval(timer);
+        $('.reminder').remove();
+        return;
+    }
+    var days = Math.floor(distance / _day);
+    var hours = Math.floor((distance % _day) / _hour);
+    var minutes = Math.floor((distance % _hour) / _minute);
+    var seconds = Math.floor((distance % _minute) / _second);
+
+    $('.reminder .d').text(days);
+    $('.reminder .h').text(hours);
+    $('.reminder .m').text(minutes);
+}
+function showRemaining2() {
+    var now = new Date();
+    var distance = end2 - now;
+    if (distance < 0) {
+        clearInterval(timer2);
+        $('.reminder2').remove();
+        return;
+    }
+    var days = Math.floor(distance / _day);
+    var hours = Math.floor((distance % _day) / _hour);
+    var minutes = Math.floor((distance % _hour) / _minute);
+    var seconds = Math.floor((distance % _minute) / _second);
+
+    $('.reminder2 .d').text(days);
+    $('.reminder2 .h').text(hours);
+    $('.reminder2 .m').text(minutes);
+}
+document.addEventListener("DOMContentLoaded", function(event) {
+    {% if not dispute_seller_info %}
+    timer = setInterval(showRemaining, 1000);
+    {% endif %}
+    {% if order.getAttribute('end_timestamp') %}
+    timer2 = setInterval(showRemaining2, 1000);
+    {% endif %}
+
+});
+{% endif %}
+</script>
+{% endblock %}

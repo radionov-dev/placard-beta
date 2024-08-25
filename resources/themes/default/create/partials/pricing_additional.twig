@@ -1,0 +1,99 @@
+{% if listing.pricing_model.can_add_additional_pricing %}
+
+    <div class="card mb-4 fieldset">
+        <h2 class="fieldset__title">{{ __("Additional options & services") }}</h2>
+        <div class="card-body">
+            <div class="repeater-default">
+                
+                <div data-repeater-list="additional">
+                    {% if listing.additional_options | length == 0 %}
+                        <div data-repeater-item>
+                            <div class="">
+                                <div class="fieldset__row"> 
+                                    <div class="field__title">
+                                        {{ __("Name") }}
+                                    </div>
+                                    <div class="field__item">
+                                        <input type="text" name="name" placeholder="{{ __("e.g.  Gift wrap") }}" class="form-control input"/>
+                                    </div>
+                                </div>
+                                <div class="fieldset__row"> 
+                                    <div class="field__title">
+                                        {{ __("Price") }}
+                                    </div>
+                                    <div class="field__item">
+                                        <input type="text" name="price" placeholder="{{ __("0.00") }}" class="form-control input"/>
+                                    </div>
+                                </div>
+                                <div class="fieldset__row"> 
+                                    <div class="field__title">
+                                        {{ __("Max Qty") }}
+                                    </div>
+                                    <div class="field__item">
+                                        <input type="text" name="max_quantity" value="" class="form-control w-100 input"/>
+                                    </div>
+                                </div>
+                                <div class="col-3">
+                                <span data-repeater-delete class="btn btn-danger btn-sm">
+                                    <span class="glyphicon glyphicon-remove"></span> {{ __("Delete") }}
+                                </span>
+                                </div>
+                            </div>
+                        </div>
+                    {% else %}
+                        {% for additional_option in listing.additional_options %}
+
+                            <div data-repeater-item>
+                                <div class="fieldset">
+                                    <div class="fieldset__row"> 
+                                    <div class="field__title">
+                                        {{ __("Name") }}
+                                    </div>
+                                    <div class="field__item">
+                                        <input type="text" name="name" value="{{additional_option.name }}" class="form-control input form-control-sm"/>
+                                    </div>
+                                    </div>
+                                    <div class="fieldset__row"> 
+                                    <div class="field__title">
+                                        {{ __("Price") }}
+                                    </div>
+                                    <div class="field__item">
+                                        <input type="text" name="price" value="{{additional_option.price }}" class="form-control form-control-sm input"/>
+                                    </div> 
+                                    </div>       
+                                    <div class="fieldset__row"> 
+                                    <div class="field__title">
+                                        {{ __("Max Qty") }}
+                                    </div>                             
+									<div class="field__item">
+                                        <input type="text" name="max_quantity" value="{{additional_option.max_quantity }}" class="form-control form-control-sm input"/>
+                                    </div>
+                                    </div>
+                                    <div class="col-3">
+                                    <span data-repeater-delete class="btn btn-danger btn-sm">
+                                        <span class="glyphicon glyphicon-remove"></span> {{ __("Delete") }}
+                                    </span> 
+                                    </div>
+                                </div>
+                            </div>
+
+                        {% endfor %}
+                    {% endif %}
+
+                </div>
+
+
+                <div class="form-group">
+                    <div class="">
+                          <span data-repeater-create class="btn btn-info btn-sm">
+                            <span class="mdi mdi-plus"></span> {{ __("Add") }}
+                          </span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+{% endif %}

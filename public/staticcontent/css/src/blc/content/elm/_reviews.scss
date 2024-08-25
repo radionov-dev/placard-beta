@@ -1,0 +1,87 @@
+.reviews{
+	margin-top: 40px;
+}
+.reviews__header{
+	margin-bottom: 10px;
+}
+.reviews__title{
+	font-size: 18px;
+	font-weight: 600;
+	display: inline-block;
+	vertical-align: baseline;
+}
+.reviews__sort{
+	display: inline-block;
+	vertical-align: baseline;
+	float: right;
+}
+.reviews__sortItem{
+	display: inline-block;
+	vertical-align: baseline;
+	margin-left: 15px;
+	color: $color-text;
+	border-bottom: 1px dashed $color-text;
+	&:hover{
+		color: $color-accent-dark;
+		text-decoration: none;
+		border-bottom: 1px solid $color-accent-dark;
+	}
+	&.active {
+		color: $color-accent-dark;
+		border-bottom: none;
+		&:hover{
+			border-bottom: none;
+		}
+	}
+}
+.review{
+	position: relative;
+	border-top: 1px solid #ececed;
+	padding: 20px 0;
+	.userBlock{
+		margin-top: 25px;
+	}
+}
+.review__content{
+	@include clearfix;
+}
+.review__text{
+	width: calc(100% - 200px);
+	float: left;
+	@include media(phone) {
+		width: 100%;
+		float: none;
+		padding-right: 30px;
+	}
+}
+.review__info{
+	float: right;
+	text-align: right;
+	padding-right: 40px;
+	width: 200px;
+	@include media(phone) {
+		width: 100%;
+		float: none;
+		text-align: left;
+		margin-top: 30px;
+	}
+}
+.review__infoPrice{
+	font-weight: 700;
+}
+.review__infoTime{}
+.review__infoSection{}
+.review__status{
+	position: absolute;
+	font-size: 0;
+	top: 26px;
+	right: 0;
+	@include media(phone) {
+
+	}
+}
+
+.reviews__total{
+	margin-top: 15px;
+}
+

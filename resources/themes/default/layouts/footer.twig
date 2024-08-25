@@ -1,0 +1,22 @@
+<footer class="footer">
+	<nav class="footerNav">
+        {% for item in menu() %}
+        <a href="{{ item.url }}" class="footerNav__link">{{ item.title }}</a>
+        {% endfor %}
+	</nav>
+	<div class="footer__copy">
+		<div id="utctime"></div>
+	</div>
+</footer>
+<script>
+	function getUtcTime() {
+		let utctime = new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '') + " UTC";
+		document.getElementById("utctime").innerHTML = utctime;
+	}
+
+	getUtcTime();
+
+	setInterval(function() {
+		getUtcTime();
+	}, 1000);
+</script>

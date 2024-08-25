@@ -1,0 +1,41 @@
+.favorite{
+	display: inline-block;
+	vertical-align: middle;
+	position: relative;
+	font-size: 12px;
+	color: $color-minor;
+	padding-left: 20px;
+	span,
+	&:after,
+	&:before{
+		display: inline-block;
+	}
+	&:after{
+		content: "\2606";
+		position: absolute;
+		left: 0;
+		font-size: 18px;
+		line-height: .9;
+	}
+}
+.favorite:hover{
+	color: $color-accent;
+	span{
+		text-transform: lowercase;
+	}
+	&:before{
+		content: attr(data-add);
+	}
+}
+.is-favorite{
+	color: $color-accent;
+	&:after{
+		content: "\2605";
+	}
+}
+.is-favorite:hover{
+	color: #d55c59;
+	&:before{
+		content: attr(data-delete);
+	}
+}

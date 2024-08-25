@@ -1,0 +1,30 @@
+.blacklist{}
+.blacklist__add{
+	font-size: 0;
+	.input{
+		display: inline-block;
+		vertical-align: middle;
+		width: calc(100% - 110px);
+		font-size: 16px;
+	}
+	.btn{
+		display: inline-block;
+		vertical-align: middle;
+		font-size: 16px;
+		border-radius: 0;
+		width: 110px;
+		height: 50px;
+		margin-left: -1px;
+	}
+}
+.blacklist__items{
+	margin-top: 30px;
+}
+.blacklist__item{
+	@include clearfix;
+	padding: 20px 0;
+	border-bottom: 1px solid #ececed;
+	.btn{
+		float: right;
+	}
+}

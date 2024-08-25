@@ -1,0 +1,125 @@
+{% extends "account.master" %}
+
+{% block user_area %}
+    <main class="content__main">
+
+        <div class="fieldset content__header">
+            <h1 class="content__title">{{ __("Deals") }}</h1>
+            <a href="{{ route('account.orders.index') }}" class="link {{ (filter_status) ? '' : 'active'  }}">{{ __("All") }}</a> |
+            <a href="{{ route('account.orders.index') }}?status=paid" class="link {{ (filter_status=='paid') ? 'active' : '' }}">{{ __("Paid") }}</a> |
+		    <a href="{{ route('account.orders.index') }}?status=completed" class="link {{ (filter_status=='completed') ? 'active' : '' }}">{{ __("Completed") }}</a> |
+		    <a href="{{ route('account.orders.index') }}?status=dispute" class="link {{ (filter_status=='dispute') ? 'active' : '' }}">{{ __("Disputes") }}</a>
+        </div>
+
+		<div class="dealList">
+		  {% for i, item in orders %}
+            <div class="dealList__item">
+                <div class="dealCard dealCard--{% if auth_check() and item.seller_id == auth_user().id %}sale{% else %}buy{% endif %}  {% if order.status == 'open' %}accent{% endif %}">
+                    <div class="dealCard__pic">
+                        <a href="{{ route('account.orders.show', item) }}"><img src="{{ item.listing.thumbnail }}" alt="{{ item.listing.title }}" class="dealCard__img" /></a>
+                    </div>
+                    <div class="dealCard__data">
+                        <a href="{{ route('account.orders.show', item) }}" class="dealCard__title">
+                            {{ item.listing.title }}
+                        </a>
+                        <div class="dealCard__status">
+                            <span class="deal-status deal-status--small deal-status--{% if item.status == 'dispute' or item.status == 'declined' %}fail{% else %}ok{% endif %}">{{ _l(item.status) }}</span>
+                            {% if item.status == 'open' and item.payment_address and item.payment_until and item.payment_until.timestamp >= date().timestamp and item.getAttribute('btc_payment_is') %}
+                                <span class="deal-status deal-status--small deal-status--major">{{ __('Pending transaction confirmation') }}</span>
+                            {% endif %}
+                        </div>
+                        <div class="dealCard__params">
+                            <div class="dealCard__param group">
+                                <div class="group__minor">{{ __('Deal price') }}:</div>
+                                <div class="group__major dealCard__price">{% if item.getAttribute('btc_payment_sum') %}{{ format_btc(item.getAttribute('btc_payment_sum'), 'btc') | raw }} / {% endif %}{{ format_to_money(item.amount, item.currency, current_currency()) }}</div>
+                            </div>
+                            <div class="dealCard__param group">
+                                <div class="group__minor">{{ __('Deal type') }}:</div>
+                                <div class="group__major">{{ item.getAttribute('bd_type') ? item.getAttribute('bd_type') : item.listing.pricing_model.name}}</div>
+                            </div>
+                        </div>
+                        <div class="dealCard__params">
+                            {% if item.listing_options.shipping_option and default_shipping %}
+                            {% set shipping_option = item.listing.shipping_options.firstWhere('id', item.listing_options.shipping_option) %}
+                            {% if shipping_option and default_shipping['values'][shipping_option.is_default-1] %}
+                            <div class="dealCard__param group">
+                                <div class="group__minor">{{ __('Shipping') }}:</div>
+                                <div class="group__major">{{  (shipping_option.name == default_shipping['values'][shipping_option.is_default-1]['label']) ? default_shipping['values'][shipping_option.is_default-1]['label'] : default_shipping['values'][shipping_option.is_default-1]['label']~' - '~shipping_option.name  }}</div>
+                            </div>
+                            {% endif %}
+                            {% endif %}
+                            <div class="dealCard__param group">
+                                <div class="group__minor">{{ __('Order Number') }}:</div>
+                                <div class="group__major">{{ item.hash }}</div>
+                            </div>
+                            <div class="block">
+                            {% if item.payment_until and item.status == 'open' %}
+                                <div class="dealCard__param group">
+                                <div class="group__minor">{{ __('Payment until') }}:</div>
+                                <div class="group__major">{{ item.payment_until.format('Y.m.d')  }}</div>
+                            </div>
+                            {% endif %}
+                            {% if item.getAttribute('end_timestamp') %}
+                                <div class="dealCard__param group">
+                                <div class="group__minor">{{ __('End') }}:</div>
+                                <div class="group__major">{{ item.getAttribute('end_timestamp')|date('Y.m.d')  }}</div>
+                            </div>
+                            {% endif %}
+                                {% if item.status == 'open' and item.payment_address and item.payment_until and item.payment_until.timestamp >= date().timestamp and item.user_id == auth_user().id %}
+                                <div class="dealCard__param">
+                                <div class="group__minor">{{ __('Payment Address') }}:</div>
+                                <div class="group__major">{{ item.payment_address  }}</div>
+                            </div>
+                            {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dealCard__wrap">
+                        {% if auth_check() and item.seller_id == auth_user().id %}
+                        <div class="dealCard__user">
+                            <a href="{{ item.user.url }}" class="userBlock">
+                                <div class="userBlock__pic">
+                                    <img src="{{ item.user.avatar }}" alt="{{ item.user.display_name }}" class="userBlock__img" />
+                                </div>
+                                <div class="userBlock__content">
+                                    <div class="userBlock__name">{{ item.user.display_name }}</div>
+                                    {{ include('components.star_rating', {rating: item.user.averageRate(), total: item.user.totalCommentCount(), date: item.user.created_at.format('Y.m') }) }}
+                                </div>
+                            </a>
+                        </div>
+                        {% else %}
+                            <div class="dealCard__user">
+                                <a href="{{ route('profile', item.seller) }}" class="userBlock">
+                                    <div class="userBlock__pic">
+                                        <img src="{{ item.seller.avatar }}" alt="{{ item.user.display_name }}" class="userBlock__img" />
+                                    </div>
+                                    <div class="userBlock__content">
+                                        <div class="userBlock__name">{{ item.seller.display_name }}</div>
+                                        {{ include('components.star_rating', {rating: item.seller.averageRate(), total: item.seller.totalCommentCount(), date: item.seller.created_at.format('Y.m') }) }}
+                                    </div>
+                                </a>
+                            </div>
+                        {% endif %}
+
+                        <div class="dealCard__total">
+                            {% if auth_check() and item.seller_id == auth_user().id %}
+                            <a href="{{ route('inbox.create', {'user_id': item.user.id, 'direct':true}) }}" class="btn btn--smal btn--accent">{{ __("Send message") }}</a>
+                            {% else %}
+                                <a href="{{ route('inbox.create', {'user_id': item.seller_id, 'direct':true}) }}" class="btn btn--smal btn--accent">{{ __("Send message") }}</a>
+                            {% endif %}
+
+                            {% if (item.status == 'completed' or item.status == 'paid' or item.status == 'shipped') and item.user_id == auth_user().id and not item.comments.count()  %}
+                            <a href="{{ route('account.orders.feedback', item) }}" class="btn btn--smal btn--accent">{{ __('Leave feedback') }}</a>
+                            {% endif %}
+                            {% if (((item.getAttribute('bd_type') == 'postpayment' or item.getAttribute('bd_type') == 'mediation') and (item.status == 'paid' or item.status == 'shipped') and item.user_id == auth_user().id) or item.status == 'dispute' and item.seller_id == auth_user().id) and not item.comments.count()  %}
+                            <a href="{{ route('account.orders.dispute', item) }}" class="btn btn--smal">{{ __('Open Dispute') }}</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+          {% endfor %}
+		</div>
+        {{ orders.links() |raw }}
+	</main>
+{% endblock %}

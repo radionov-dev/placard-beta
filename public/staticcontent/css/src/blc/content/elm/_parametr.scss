@@ -1,0 +1,17 @@
+.parametr{
+	margin-top: 10px;
+	.option{
+		padding-bottom: 1px;
+		margin-right: 20px;
+		padding-left: 20px;
+	}
+}
+.parametr__title,
+.parametr__options{
+	display: inline-block;
+	vertical-align: middle;
+	margin-top: 5px;
+}
+.parametr__title{
+	margin-right: 15px;
+}

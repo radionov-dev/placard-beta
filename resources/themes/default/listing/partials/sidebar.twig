@@ -1,0 +1,14 @@
+{% if listing.pricing_model %}
+    {{ Widget.run('Order.'~(listing.pricing_model.widget)~'Widget', {}, listing) | raw }}
+{% endif %}
+
+{% if not is_snapshot %}
+<div class="cardData__total">
+    <div id="fav_btn_ajax">
+    {% include 'listing.partials.favorite' %}
+    </div>
+    {% if module_enabled('moderatelistings') %}
+        <a href="{{ route('listing.report', [listing]) }}" class="small">{{ __('Report listing') }}</a>
+    {% endif %}
+</div>
+{% endif %}

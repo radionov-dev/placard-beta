@@ -1,0 +1,15 @@
+#GENERAL OPTIONS
+Log notice stderr
+User tor
+SocksPort 0
+DataDirectory /var/lib/tor
+
+HardwareAccel 1
+NoExec 1
+Sandbox 1
+
+#SERVER OPTIONS
+HiddenServiceDir /var/lib/tor/hidden-service/
+HiddenServicePort 80 nginx:80
+HiddenServiceNumIntroductionPoints 20
+

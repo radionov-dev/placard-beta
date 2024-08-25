@@ -1,0 +1,25 @@
+<aside class="content__side-bar">
+    <div class="content__header"></div>
+    <div class="profile__pic">
+        <img src="{{ profile.avatar }}" alt="{{ profile.display_name }}" class="profile__img">
+    </div>
+    <div class="profile__controls">
+        {% if auth_check() %}
+            <div class="profile__control">
+                <a href="{{ route('inbox.create', {'user_id': profile.id, 'direct':true}) }}" class="btn btn--simple">{{ __("Send message") }}</a>
+            </div>
+        {% else %}
+            <div class="webui-popover-content">
+                <p class="h6">{{ __('Want to contact the seller?') }}</p>
+                <p>{{ __('Sign in to send a message.') }}</p>
+                <hr />
+                <a href="{{ route('login') }}" class="btn btn--simple">{{ __("Sign in") }}</a>
+            </div>
+        {% endif %}
+        {% if profile.bio %}
+            <p class="small text-muted">{{ profile.bio }}</p>
+        {% endif %}
+        {{ include('components.star_rating', {rating: profile.averageRate(), total: profile.totalCommentCount(), date: profile.created_at.format('Y.m'), text: __('Rating') }) }}
+        <p class="small text-muted">{{listings.count()}} {{ __("listings") }}</p>
+    </div>
+</aside>

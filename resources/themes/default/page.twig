@@ -1,0 +1,12 @@
+{% extends "layouts.app" %}
+
+{% block search_bar %}{% endblock %}
+
+{% block content %}
+	<div class="content__header">
+		<h1 class="content__title">{{ page.title }}</h1>
+	</div>
+	<main class="content__main">
+        {{ page.content | raw }}
+    </main>
+{% endblock %}

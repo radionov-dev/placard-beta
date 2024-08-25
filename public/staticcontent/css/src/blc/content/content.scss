@@ -1,0 +1,141 @@
+.content{
+	@include container;
+	min-height: 850px;
+	overflow: hidden;
+	position: relative;
+}
+.content--chat{
+	height: 864px;
+	min-height: auto;
+}
+.content--index{
+	@include deleteContainer;
+	position: relative;
+	.content__header,
+	.content__main{
+		@include container;
+	}
+	&:before{
+		content: "";
+		position: absolute;
+		z-index: -1;
+		top: 0;
+		bottom: 15%;
+		left: 0;
+		right: 0;
+		background-color: #f7f7f7;
+	}
+	h2.content__title{
+		font-size: 24px;
+		margin: 35px 0 20px;
+	}
+}
+
+
+
+
+.content__header{
+	line-height: 1;
+	margin-bottom: 40px;
+}
+h1.content__title{
+	font-size: 30px;
+	margin: 30px 0;
+}
+h2.content__title{
+	font-size: 24px;
+}
+.content__description{
+	font-size: 14px;
+	margin-top: 25px;
+}
+.content__link{
+	display: inline-block;
+	margin-top: 15px;
+	&:hover{
+		text-decoration: none;
+	}
+}
+.content__side-bar{
+	width: 258px;
+}
+.content__main{
+	width: 100%;
+}
+
+.content--sideLeft{
+	@include clearfix;
+	.content__side-bar{
+		float: left;
+	}
+	.content__main{
+		width: calc(100% - 288px);
+		float: right;
+	}
+	@include media(phone-tablet) {
+		.content__main{
+			width: 100%;
+			float: none;
+		}
+		.content__side-bar{
+			display: none;
+		}
+	}
+}
+.content--sideRight{
+	@include clearfix;
+	.content__side-bar{
+		float: right;
+	}
+	.content__main{
+		width: calc(100% - 288px);
+		float: left;
+	}
+	@include media(phone-tablet) {
+		.content__side-bar,
+		.content__main{
+			width: 100%;
+			float: none;
+		}
+	}
+}
+
+
+.orientation-line{
+	display: inline-block;
+	vertical-align: middle;
+	background-image: url(/staticcontent/img/icon/orientation-line.png);
+	width: 14px;
+	height: 10px;
+}
+.orientation-cell{
+	display: inline-block;
+	vertical-align: middle;
+	background-image: url(/staticcontent/img/icon/orientation-cell.png);
+	width: 12px;
+	height: 12px;
+}
+
+@import "elm/group";
+@import "elm/nav";
+@import "elm/breadcrumb";
+@import "elm/filter";
+@import "elm/catalog";
+@import "elm/card";
+@import "elm/pagination";
+@import "elm/promoblock";
+@import "elm/box";
+@import "elm/user";
+@import "elm/reviews";
+@import "elm/profile";
+@import "elm/form";
+@import "elm/list";
+@import "elm/blacklist";
+@import "elm/notice";
+@import "elm/deal";
+@import "elm/parametr";
+@import "elm/comment";
+@import "elm/order";
+@import "elm/inventory";
+@import "elm/chat";
+@import "elm/popup";

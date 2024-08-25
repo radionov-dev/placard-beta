@@ -1,0 +1,38 @@
+{% if level_categories|length > 1 or (setting('categories_hide_empty') or level_categories|length > 0) %}
+	<nav class="contentNav">
+
+		{% if not auth_guest() %}
+        <div class="contentNav__title contentNav__title--favorites {{ active(['account.favorites.index'], 'active') }}"><a class="contentNav__link" href="{{ route('account.favorites.index') }}">{{ __('Favorites') }}</a></div>
+        {% endif %}
+
+
+        {% for parent_category in parent_categories %}
+		<div class="contentNav__title {{ (category and (parent_category.id == category.id or parent_category.id == category.parent_id))?'active':'' }}">
+		  <a class="contentNav__link" href="{{ active(['browse']) ? request().fullUrlWithQuery({'category' : parent_category.id}) : route('browse', {'category' : parent_category.id}) }}">{{ _l(parent_category.name)}}</a>
+		</div>
+        {% endfor %}
+
+        {% if level_categories %}
+        <section class="contentNav__items">
+          {% for level_category in level_categories %}
+            {% if (category and level_category.id == category.id) %}
+            <div class="contentNav__item active">
+              {{ _l(level_category.name) }}
+            </div>
+            {% else %}
+            <div class="contentNav__item">
+              <a class="contentNav__link" href="{{ active(['browse']) ? request().fullUrlWithQuery({'category' : level_category.id}) : route('browse', {'category' : level_category.id}) }}">{{ _l(level_category.name) }}</a>
+            </div>
+            {% endif %}
+          {% endfor %}
+        </section>
+        {% endif %}
+        {{ form_hidden( 'category',  category_id) }}
+
+        <div class="contentNav__title {{ ((active(['browse']) and not category) ? 'active' : '') }}">
+			<a class="contentNav__link" href="{{ active(['browse']) ? request().fullUrlWithQuery({'category' : null}) : route('browse') }}">{{ __("All categories") }}</a>
+		</div>
+	</nav>
+
+
+{% endif %}

@@ -1,0 +1,47 @@
+<div class="">
+	<div class="catalog js-catalog catalog--line">
+            {% for item in listings %}
+                <div class="catalog__item">
+                    <div class="catalogCard">
+                        {% if item.spotlight %}
+                            <div class="ribbon"><span>{{ __("FEATURED") }}</span></div>
+                        {%  endif %}
+                        <div class="catalogCard__pic">
+                            <a href="{{route('listing', {'id' : item, 'slug' : str_slug(item.title)})}}" ><img class=" catalogCard__img" ssrc="/images/ajax-loader.gif" src="{{ item.thumbnail }}?w=400&h=400" alt="{{item.title}}"></a>
+                        </div>
+                        <div class="catalogCard__data">
+                            <a href="{{route('listing', {'id' : item, 'slug' : str_slug(item.title)})}}" class="catalogCard__title">{{item.title}}</a>
+                            <p>{{ item.short_description | raw}}</p>
+                            <div class="catalogCard__params">
+                                <div class="catalogCard__param group">
+                                  <div class="group__minor">Deal type:</div>
+                                  <div class="group__major">{{item.pricing_model.name}}</div>
+                                </div>
+                                {% if filters %}
+                                    {% for filter in filters %}
+                                        {% if item.meta[filter.field] is defined and item.meta[filter.field] is not null %}
+                                            <div class="catalogCard__param group">
+                                            <div class="group__minor">{{ _l(filter.name) }}:</div>
+                                                {% if filter.form_input_meta.values is iterable %}{% set i=0 %}{% for option in filter.form_input_meta.values %}
+                                                    {% if option.value in item.meta[filter.field] %}
+                                                        {% if i %}<div class="group__major">/&nbsp;</div>{% endif %}<div class="group__major">{{ _l(option.label) }}&nbsp;</div>
+                                                        {% set i=i+1 %}{% endif %}
+                                                {% endfor %} {% else %}{{ item.meta[filter.field] }}{% endif %}
+                                        </div>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="catalogCard__total">
+                            <div class="catalogCard__price">
+                                <div class="catalogCard__priceFrom">{{ (item.price_in_btc ? format_btc(item.btc_price, 'BTC') : format_btc(item.price_updated, item.currency)) | raw }}</div>
+                                <div class="catalogCard__priceTo">{% if current_currency() != 'USD' %}{{ format_usd(item.price_updated, item.currency) }} /{% endif %} {{ format_to_money(item.price, item.currency, current_currency()) }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+		
+	</div>
+</div>

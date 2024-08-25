@@ -1,0 +1,52 @@
+{% extends "layouts.app" %}
+
+{% block search_bar %}{% endblock %}
+
+{% block content %}
+  <div class="content__header">
+  </div>
+  <main class="content__main">
+    <div class="popup" style=" z-index: 0; ">
+      <form method="POST" action="{{ route('login') }}" class="form">
+        {{ csrf_field() }}
+
+        {% if(setting('facebook_key')) %}
+
+        <a href="/login/facebook" data-turbolinks="false" class="btn btn-md btn-facebook btn-block mt-3"><i class="fa fa-facebook fa-fw"></i> {{ __('Login with Facebook') }}</a>
+
+        <div class="col-12 text-center text-muted mb-4 mt-4">
+            — {{ __('or') }} —
+        </div>
+        {% endif %}
+        <div class="fieldset" id="login_form">
+		  <div class="fieldset__content">
+			<div class="fieldset__row">
+              <div class="field">
+                <label class="field__title" for="email">{{ __('Login') }}</label>
+                <div class="field__item">
+                  <input class="input{{errors.has('email') ? ' is-invalid' : '' }}" type="text" id="email" name="email" value="{{ old('email') }}" placeholder="Email/BitMessage" required autofocus>
+                </div>
+              </div>
+            </div>
+            <div class="fieldset__row">
+              <div class="field">
+                <label class="field__title" for="password">{{ __('Password') }}</label>
+                <div class="field__item">
+                  <input class="input{{errors.has('password') ? ' is-invalid' : '' }}" type="password" id="password" name="password" placeholder="{{ __('enter password...') }}"  required aria-describedby="passwordHelp" >
+                </div>
+              </div>
+            </div>
+			<div class="form__total">
+              <a href="{{ route('password.request') }}" class="link">{{ __('Forgot Your Password?') }}</a>
+			  <div class="option">
+				<input type="checkbox" id="save" name="remember" {{ input_get('remember') ? 'checked' : '' }}>
+				<label for="save">{{ __("Remember Me") }}</label>
+			  </div>
+			  <input class="btn btn--accent" type="submit" value="{{ __('Login') }}">
+			</div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </main>
+{% endblock %}

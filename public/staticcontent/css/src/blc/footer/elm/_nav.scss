@@ -1,0 +1,25 @@
+.footerNav {
+	float: right;
+	max-width: 70%;
+	@include media(phone-smartphone) {
+		display: block;
+		margin-bottom: 15px;
+		float: none;
+		max-width: 100%;
+		width: 100%;
+	}
+}
+
+	.footerNav__link {
+		@include links (#a0a2a7, $color-accent);
+		display: inline-block;
+		float: left;
+		margin-left: 25px;
+		margin-bottom: 10px;
+		white-space: nowrap;
+		@include media(phone-smartphone) {
+			float: none;
+			margin-right: 25px;
+			margin-left: 0;
+		}
+	}

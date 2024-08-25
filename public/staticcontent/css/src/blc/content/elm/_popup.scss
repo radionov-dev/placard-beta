@@ -1,0 +1,70 @@
+.popup{
+	position: relative;
+	z-index: 10;
+	background-color: #fff;
+	max-width: 735px;
+	width: 100%;
+	box-shadow: 0 0 30px 0 rgba(0, 0, 0, 0.3);
+	padding: 35px 43px;
+	margin: 0 auto;
+	.field__item{
+		width: 83%;
+	}
+	.form__total{
+		margin-top: 30px;
+		text-align: right;
+		.btn{
+			font-size: 14px;
+			margin-left: 15px;
+		}
+	}
+	.option{
+		margin-left: 20px;
+	}
+}
+.popup__close{
+	position: absolute;
+	z-index: 11;
+	top: 30px;
+	right: 42px;
+	width: 30px;
+	height: 30px;
+	font-size: 0;
+	text-indent: -9999px;
+	background-image: url(/staticcontent/img/icon/close-popup.png);
+	background-size: 30px;
+	cursor: pointer;
+	text-decoration: none;
+}
+.popup__header{
+	margin-bottom: 30px;
+}
+.popup__title{
+	font-size: 30px;
+	margin: 0;
+	font-weight: 600;
+}
+.popup__content{}
+.popuppopupMessages{}
+.popupMessages__user{
+	background-color: #f5f6f6;
+	padding: 20px 17px;
+	border-top: 1px solid #ececed;
+	border-left: 1px solid #ececed;
+	border-right: 1px solid #ececed;
+}
+.popup.modal{
+	position: fixed;
+	top: 20px;
+	left: 0;
+	right: 0;
+}
+.popup_back{
+	position: fixed;
+	z-index: 9;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	background: rgba(41, 43, 49, 0.5);
+}

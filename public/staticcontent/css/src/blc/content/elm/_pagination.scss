@@ -1,0 +1,31 @@
+.pagination{
+	border-top: 1px solid #ececed;
+	border-bottom: 1px solid #ececed;
+	padding: 10px 0;
+	text-align-last: justify;
+}
+.pagination__sort,
+.pagination__title,
+.pagination__items,
+.pagination__item{
+	display: inline-block;
+	vertical-align: middle;
+}
+.pagination__item{
+	padding: 10px 10px 11px 10px;
+	color: $color-accent;
+	&:hover{
+		text-decoration: underline;
+	}
+	&.fake{
+		text-decoration: none;
+		cursor: default;
+	}
+}
+.active{
+	color: $color-text;
+	cursor: default;
+	&:hover{
+		text-decoration: none;
+	}
+}

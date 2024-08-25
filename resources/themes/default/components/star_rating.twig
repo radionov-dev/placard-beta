@@ -1,0 +1,6 @@
+{% if text %}
+<div class="userBlock__data">{{ __('Registered on') }}: {{ date }}</div>
+<div class="userBlock__data">{{ text }}: {{ total }}, {{ ((rating/3)*100)|round }}%</div>
+{% else %}
+({{ total }}, {{ ((rating/3)*100)|round }}%)
+{% endif %}

@@ -1,0 +1,223 @@
+version: '3'
+
+networks:
+  placard:
+  tor:
+  i2p:
+  mysql:
+
+
+services:
+  bitdeals-module:
+    #build:
+    #  context: https://git.bitdeals.org/private/apostol-dm.git
+    #  dockerfile: docker/Dockerfile
+    image: bitdeals/apostol-dm
+    restart: unless-stopped
+    environment:
+      - DM_TESTNET=1
+      - DM_BITCOIN=
+      - DM_FEE=0.1%
+      - |
+        DM_PGP_SEC=
+        -----BEGIN PGP PRIVATE KEY BLOCK-----
+        
+        -----END PGP PRIVATE KEY BLOCK-----
+    volumes:
+      - dm:/home/dm
+    ports:
+      - "4999"
+
+  bitmessage:
+    #build:
+    #  context: https://git.bitdeals.org/private/bitmessage.git
+    #  dockerfile: docker/Dockerfile
+    image: bitdeals/pybitmessage:0.6.3.2-ubuntu
+    restart: unless-stopped
+    volumes:
+      - bitmessage:/home/bitmessage
+    environment:
+      - BITMESSAGE_API_USER=bitmessage_api_user
+      - BITMESSAGE_API_PASSWORD=bitmessage_api_password
+      - BITMESSAGE_SEED_PHRASE=bitmessage_seed_password
+      - BITMESSAGE_TTL=172800
+      - BITMESSAGE_STOPRESENDINGAFTERXDAYS=60
+    networks:
+      - placard
+    ports:
+      - "8442"
+
+#Let's Encrypt requires domain's public A/AAAA DNS records pointed at your machine.
+  certbot:
+    build:
+      context: .
+      dockerfile: docker/certbot.Dockerfile
+    image: bitdeals/certbot
+    restart: unless-stopped
+    environment:
+      - DOMAIN=
+      - EMAIL=
+    volumes:
+      - certificates:/etc/certificates
+      - letsencrypt:/etc/letsencrypt
+    networks:
+      - default
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do /etc/scripts/1-renew-cert.sh ; sleep 12h & wait $${!}; done;'"
+
+  electrum:
+    build:
+      context: .
+      dockerfile: docker/electrum.Dockerfile
+    image: bitdeals/electrum
+    restart: unless-stopped
+    environment:
+      - ELECTRUM_API_USER=electrum_api_user
+      - ELECTRUM_API_PASSWORD=electrum_api_password
+      - ELECTRUM_TESTNET=1
+    networks:
+      - placard
+    ports:
+      - "7000"
+
+  haproxy:
+    image: bitnami/haproxy:2
+    restart: unless-stopped
+    volumes:
+      - ./docker/haproxy.cfg:/bitnami/haproxy/conf/haproxy.cfg:ro
+      - certificates:/usr/local/etc/haproxy/certificates:ro
+    networks:
+      - default
+      - placard
+    ports:
+      - "80:80"
+      - "443:443"
+      - "9999"
+    depends_on:
+      - nginx
+      - certbot
+
+#  i2pd:
+#    image: purplei2p/i2pd
+#    restart: unless-stopped
+#    volumes:
+#      - ./docker/i2pd.conf:/home/i2pd/i2pd.conf:ro
+#      - ./docker/i2pd.tunnels.conf:/home/i2pd/data/tunnels.conf:ro
+#      - i2p:/home/i2pd/data
+#    networks:
+#      - i2p
+#    command: --conf /home/i2pd/i2pd.conf
+
+  mysql:
+    image: bitnami/mysql:8.2
+    restart: unless-stopped
+    environment:
+      - MYSQL_ROOT_PASSWORD=mysql_root_password
+      - MYSQL_DATABASE=mysql_database
+      - MYSQL_USER=mysql_user
+      - MYSQL_PASSWORD=mysql_password
+    volumes:
+      - mysql:/bitnami/mysql/data
+    networks:
+      - mysql
+    ports:
+      - "3306"
+
+  nginx:
+    image: bitnami/nginx:1.25
+    restart: unless-stopped
+    volumes:
+      - ./docker/nginx.conf:/opt/bitnami/nginx/conf/server_blocks/nginx.conf:ro
+      - php_socket:/run
+      - public:/app/public
+      - storage:/app/storage
+    networks:
+      - placard
+      - tor
+      - i2p
+    ports:
+      - "80"
+
+  php-app:
+    image: bitdeals/placard
+    restart: unless-stopped
+    build: ./docker
+    environment:
+      - APP_NAME=PlaCard
+      - APP_DEBUG=true
+      - DEBUGBAR_ENABLED=false
+      - APP_URL=https://127.0.0.1
+      - APP_LOCALE=en
+      - DB_HOST=mysql
+      - DB_DATABASE=mysql_database
+      - DB_USERNAME=mysql_user
+      - DB_PASSWORD=mysql_password
+      - BITDEALS_HOST=dm
+      - BITDEALS_PORT=4999
+      - REDIS_HOST=redis
+      - REDIS_PASSWORD=redis_password
+      - GEOIP_RANDOM=true
+      - BITMESSAGE_IP=bitmessage:8442
+      - BITMESSAGE_CLIENT_USERNAME=bitmessage_api_user
+      - BITMESSAGE_CLIENT_PASSWORD=bitmessage_api_password
+      - ELECTRUM_IP=electrum:7000
+      - ELECTRUM_CLIENT_USERNAME=electrum_api_user
+      - ELECTRUM_CLIENT_PASSWORD=electrum_api_password
+
+    volumes:
+      - php_socket:/opt/bitnami/php/var/run
+      - public:/app/public
+      - storage:/app/storage
+    networks:
+      - placard
+      - mysql
+    ports:
+      - "9000"
+
+#  phpmyadmin:
+#    image: bitnami/phpmyadmin:5.2.0
+#    restart: unless-stopped
+#    environment:
+#      - DATABASE_HOST=mysql
+#      - DATABASE_USER=mysql_user
+#      - DATABASE_PASSWORD=mysql_password
+#    networks:
+#      - mysql
+#    ports:
+#      - '8080'
+
+  redis:
+    image: bitnami/redis:7.0.5-debian-11-r0
+    restart: unless-stopped
+    environment:
+      - REDIS_PASSWORD=redis_password
+    volumes:
+      - redis:/bitnami/redis/data
+    networks:
+      - placard
+
+#  tor:
+#    build:
+#      context: .
+#      dockerfile: docker/tor.Dockerfile
+#    image: bitdeals/tor
+#    restart: unless-stopped
+#    volumes:
+#      - ./docker/torrc:/etc/tor/torrc:ro
+#      - tor:/var/lib/tor/hidden-service
+#    networks:
+#      - tor
+
+
+volumes:
+  bitmessage:
+  certificates:
+  dm:
+ #i2p:
+  letsencrypt:
+  mysql:
+  php_socket:
+  public:
+  redis:
+  storage:
+ #tor:
+

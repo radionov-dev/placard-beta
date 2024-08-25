@@ -1,0 +1,291 @@
+
+{% extends "layouts.app" %}
+    
+
+{% block content %}
+
+
+    <div class="bg-white window-height" data-turbolinks="false">
+
+
+
+        {{ form_open({'url' : url, 'class':' ',  }) }}
+    <div class="content__header order__header">
+                <h1 class="content__title"><i class="fa fa-lock text-dark " aria-hidden="true"></i> {{ __('Secure checkout') }}</h1>
+            </div>
+        <div class="container-fluid content--sideRight order" id="checkout-page">
+            <aside class="content__side-bar">
+					{#{ __('Bitcoin address is not set for your account') }#}
+				<div class="order__rate">
+			<div class="order__rateItem">1 BTC = {{ format_usd(1, 'BTC') }}</div>
+			<div class="order__rateItem">1 USD = {{ format_btc(1, 'USD') | raw }}</div>
+		</div>
+	</aside>
+            <main class="content__main">
+            <div class="orderInfo">
+                <div class="orderInfo__header">
+                    <div class="orderInfo__cell">Item name</div>
+                    <div class="orderInfo__cell"></div>
+                    <div class="orderInfo__cell">Delivery days</div>
+                </div>
+                <div class="orderInfo__content">
+					<div class="orderInfo__row orderInfo__row--main">
+						<div class="orderInfo__pic">
+							<img src="{{ listing.thumbnail }}" alt="{{ listing.title }}" class="orderInfo__img">
+						</div>
+						<div class="orderInfo__cell orderInfo__title">{{ listing.title }}
+                            {%  for choice in pricing.user_choice %}
+                                        <div class="product__value">
+                                        <span>{{ choice.name|capitalize }}</span>
+                                        <span>
+                                            {%  if choice.group == 'dates' %}
+                                                {{ choice.value | date("d/m/Y") }}
+                                            {% else %}
+                                                {{ choice.value }}
+                                            {% endif %}
+                                        </span>
+                                    </div>
+                                    {% endfor %}
+                        </div>
+					</div>
+				</div>
+                <div class="orderInfo__total">
+                    <div class="orderInfo__cell">Total:</div>
+                    <div class="orderInfo__cell">
+                        {% if current_currency() != 'USD' %}{{ format_usd(pricing.total, listing.currency) }} /{% endif %} {{ format_to_money(pricing.total, listing.currency, current_currency()) }} /
+                        {% if pricing.total_btc and listing.price_in_btc %}
+                        {{ format_btc(pricing.total_btc, 'BTC') | raw }}
+                        {% else %}
+                        {{ format_btc(pricing.total, listing.currency) | raw }}
+                        {% endif %}
+                    </div>
+			    </div>
+		    </div>
+            
+            {% if pricing.error %}
+                <div class="alert alert-danger" role="alert">
+                {{ pricing.error }}
+            </div>
+            {% endif %}
+            <div class="row mt-4"  >
+            <div class="col-sm-7"  >
+
+                {% include 'notifications' %}
+            <div class="fieldset">
+                {% if not digital or auth_guest() %}
+                <h3 class="fieldset__title">{{ __("Delivery address") }}</h3>
+                {% endif %}
+                <div class="bg-light rounded fieldset__content">
+                    <div class="field" id="shipping-address">
+                        {% if auth_guest() %}
+                    <div class="fieldset__row">
+						<div class="field">
+							<label for="name" class="field__title">{{ __("Name") }}</label>
+							<div class="field__item">
+								<input class="input{{ errors.has('name') ? ' is-invalid' : '' }}" type="text" id="name" name="name" value="{{ old('name') }}" placeholder="e.g. Jack Sparrow" required autofocus>
+                                {% if errors.has('name') %}
+                                    <small class="form-control-feedback invalid-feedback">{{ errors.first('name') }}</small>
+                                {% endif %}
+							</div>
+						</div>
+					</div>
+					<div class="fieldset__row">
+						<div class="field">
+							<label for="email" class="field__title">{{ __("Email/Bitmessage address") }}</label>
+							<div class="field__item">
+								<input class="input{{ (errors.has('email') or errors.has('bitmessage')) ? ' is-invalid' : '' }}" type="text" id="email" name="email" value="{{ old('email') }}"  required>
+                                {% if errors.has('email') %}
+                                    <small class="form-control-feedback invalid-feedback">{{ errors.first('email') }}</small>
+                                {% endif %}
+                                {% if errors.has('bitmessage') %}
+                                    <small class="form-control-feedback invalid-feedback">{{ errors.first('bitmessage') }}</small>
+                                {% endif %}
+							</div>
+						</div>
+					</div>
+					<div class="fieldset__row">
+						<div class="field">
+							<label for="password" class="field__title">{{ __("Password") }}</label>
+							<div class="field__item">
+								<input class="input{{ errors.has('password') ? ' is-invalid' : '' }}" placeholder="{{ __("Something secure") }}" type="password" id="password" name="password" required aria-describedby="passwordHelp">
+                                {% if errors.has('password') %}
+                                    <div class="form-control-feedback invalid-feedback">{{ errors.first('password') }}</div>
+                                {% endif %}
+                                <input class="input" id="password-confirm" type="password" name="password_confirmation" placeholder="{{ __("Confirm your password") }}" required>
+							</div>
+						</div>
+					</div>
+					<div class="fieldset__row">
+						<div class="field">
+							<label for="bitcoin" class="field__title">{{ __("Bitcoin Address") }}</label>
+							<div class="field__item">
+								<input class="input{{ errors.has('bitcoin') ? ' is-invalid' : '' }}" placeholder="{{ __("Bitcoin Address") }}" type="text" id="bitcoin" name="bitcoin" value="{{ old('bitcoin') }}" onchange="bs_status();" required>
+                                {% if errors.has('bitcoin') %}
+                                    <div class="form-control-feedback invalid-feedback">{{ errors.first('bitcoin') }}</div>
+                                {% endif %}
+							</div>
+						</div>
+					</div>
+                            <!--div class="fieldset__row">
+						<div class="field">
+							<label for="bitcoin_public_key" class="field__title">{{ __('Bitcoin Public Key') }}</label>
+							<div class="field__item">
+								{{ form_textarea('bitcoin_public_key', null, {'class' : 'input','id' : 'bitcoin_public_key'}) }}
+							</div>
+						</div>
+					</div-->
+                        {% endif %}
+
+                        {% if not auth_guest() and digital %}
+                            {{ form_hidden('billing_address[full_name]', user.display_name??user.billing_address.full_name) }}
+                            {{ form_hidden('billing_address[address]', user.address??user.billing_address.address) }}
+                            {{ form_hidden('billing_address[city]', user.city??user.billing_address.city) }}
+                            {{ form_hidden('billing_address[state]', user.state??user.billing_address.state) }}
+                            {{ form_hidden('billing_address[zip]', user.zip??user.billing_address.zip) }}
+                            {{ form_hidden('billing_address[country]', user.country??user.billing_address.country) }}
+                        {% else %}
+
+                        <div class="fieldset__row">
+                            <div class="field__title">{{ __("Full Name") }}</div>
+                            <div class="field__item">
+                                {{ form_text('billing_address[full_name]', user.billing_address.full_name, {'class':'form-control input', 'placeholder': '', "required":"required"}) }}
+                            </div>
+                        </div>
+
+                        <div class="fieldset__row">
+                            <div class="field__title">{{ __("Address") }}</div>
+                            <div class="field__item">
+                                {{ form_text('billing_address[address]', user.billing_address.address, {'class':'form-control input', 'placeholder': ''}) }}
+                            </div>
+                        </div>
+                        <div class="fieldset__row">
+                            <div class="field__title">{{ __("City") }}</div>
+                            <div class="field__item">
+                                {{ form_text('billing_address[city]', user.billing_address.city, {'class':'form-control input', 'placeholder':'' }) }}
+                            </div>
+                        </div>
+                        <div class="fieldset__row">
+                            <div class="field__title">{{ __("State") }}</div>
+                            <div class="field__item">
+                                {{ form_text('billing_address[state]', user.billing_address.state, {'class':'form-control input', 'placeholder':''}) }}
+                            </div>
+                        </div>
+                        <div class="fieldset__row">
+                            <div class="field__title">{{ __("Post code/Zip") }}</div>
+                            <div class="field__item">
+                                {{ form_text('billing_address[zip]', user.billing_address.zip, {'class':'form-control input', 'placeholder':''}) }}
+                            </div>
+                        </div>
+                        <div class="fieldset__row">
+                            <div class="field__title">Country</div>
+                            <div class="field__item">
+                                {{ form_select('billing_address[country]', countries, user.billing_address.country, {'class' : 'custom-select input'} ) }}
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        {% if auth_guest() %}
+                            <div class="fieldset__row" id="captcha_row">
+						<div class="field">
+							<label for="captcha" class="field__title">{{ __("Captcha") }}</label>
+							<div class="field__item">
+								<input type="text" id="captcha" name="captcha" class="input" autocomplete="off" style="display: inline-block; vertical-align: top; width: auto;" required>
+                                {{ captcha|raw }}<br>
+                                {% if errors.has('captcha') %}
+                                    <small class="form-control-feedback invalid-feedback">{{ errors.first('captcha') }}</small>
+                                {% endif %}
+							</div>
+						</div>
+					</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+
+                <div class="custom-control custom-checkbox fieldset__row" style="display: none">
+                    <input type="checkbox" name="same_address" {{ not input_has('same_address')?'checked="checked"':'' }} ic-action="toggle" ic-target="#shipping-address" class="custom-control-input" id="same-address" value="1">
+                    <label class="custom-control-label" for="same-address">{{ __('Shipping address is the same as my billing address') }}</label>
+                </div>
+
+
+                
+            </div>
+            <div class="fieldset">
+            <h3 class="fieldset__title" style="display: none">{{ __("Payment methods") }}</h3>
+            <div class="bg-light rounded fieldset__content">
+                {% if payment_providers|length > 0 %}
+                    <div class=" bg-light p-3 border-0" style="display: none">
+                {% for payment_provider in payment_providers  %}
+                    <div class="custom-control custom-radio">
+                    {{ form_radio('payment_method', payment_provider.key, (payment_method == payment_provider.key), {'class':'custom-control-input', 'id':payment_provider.key}) }}
+                        <label class="custom-control-label" for="{{ payment_provider.key }}">{{ payment_provider.display_name }}</label>
+                    <p class="text-muted" for="{{ payment_provider.key }}">{{ payment_provider.payment_instructions }}</p>
+                </div>
+                {% endfor %}
+            </div>
+			{% else %}
+                    <input type="radio" value="1" name="payment_method">
+                    <div class="alert alert-danger" role="alert">
+					{{ __("This seller has no payment methods available.") }}<br /><a href="{{listing.url}}?{{get_query_string()}}" class="alert-link">{{__('Contact seller')}}</a>
+				</div>
+                {% endif %}
+
+                {% if payment_providers|length > 0 %}
+                    <div class="row"  >
+
+                <div class="col-sm-12 text-left"  >
+
+                    <button class="btn btn-primary mt-3 " type="submit">{{ __('Place order') }}</button>
+
+                </div>
+                <div class="col-sm-12"  >
+
+                <br />
+                <p class="text-muted small">{{ __('By clicking "Place Order" I agree to the terms & conditions of this Merchant.') }}
+                </p>
+            </div>
+
+            </div>
+                {% endif %}
+                </div>
+            
+            </div>
+
+            
+            </div>
+        </main>
+        </div>
+        {{ form_close() }}
+
+
+    </div>
+
+    {% if auth_guest() %}
+    <script>
+		function bs_status() {
+            var data = Object();
+            data['bitcoin'] = $('#bitcoin').val();
+
+            $.ajax({
+                url: '{{ route('bitdeals.status') }}',
+                data:data,
+                success: function (data) {
+                    $('#user_sign').remove();
+
+                    if(data['user_status']) {
+                        var html = '<div class="fieldset__row" id="user_sign"> <div class="field"> <label for="sign" class="field__title">{{ __("BitDeals Signature") }}</label> <div class="field__item"> <textarea class="textarea" placeholder="{{ __("Sign this text using your bitcoin key") }}" onchange="$(\'#sign_f\').text($(this).val())"  id="sign" name="sign" required></textarea> </div><div id="info-sing-text" class="field__tooltip" style="padding-top: 0;word-wrap: break-word;">'+data['sign_html']+'\n<div id="sign_f"></div></div> <a class="field__title" id="copy-btn" style="position: absolute; margin: 0; padding: 0; right: 0; width: auto;" href="javascript://" onclick="copy_data(\'info-sing-text\');">{{ __("Copy") }}</a></div> </div>';
+
+                        $('#captcha_row').before(html);
+                    }
+                }
+            });
+        }
+
+
+        {% if(old('sign')) %}
+        bs_status();
+        {% endif %}
+	</script>
+    {% endif %}
+
+{% endblock %}

@@ -1,0 +1,126 @@
+{% extends "account.master" %}
+
+{% block user_area %}
+    <main class="content__main">
+    {% include 'notifications' %}
+        <h1 class="content__title">{{ __('Dispute for Order') }} {{ order.hash }}</h1>
+        {{ form_model(user, {'url' :  route('account.orders.dispute', order), 'files': true, 'id':'dispute', 'class' : 'form'}) }}
+        <div class="fieldset">
+      <div class="fieldset__content">
+        {% if user.id == order.user_id %}
+	    <div class="fieldset__row">
+          <div class="field">
+            <label class="field__title">{{ __('Dispute Reason') }}</label>
+            <div class="field__item" id="reason">
+                {% if return %}
+              <div class="option">
+              {{ form_radio('reason', 1, true, {'class':'radio', 'id':'reason-return'}) }}
+                  <label class="custom-control-label" for="reason-return">{{ __('Return for any reason') }}</label>
+                </div>
+                {% endif %}
+                {% if not digital %}
+              <div class="option">
+              {{ form_radio('reason', 2, null, {'class':'radio', 'id':'reason-received'}) }}
+                  <label class="custom-control-label" for="reason-received">{{ __('I haven’t received my order') }}</label>
+              </div>
+                {% endif %}
+              <div class="option">
+              {{ form_radio('reason', 3, null, {'class':'radio', 'id':'reason-issues'}) }}
+                  <label class="custom-control-label" for="reason-issues">{{ __('The item Quality issues') }}</label>
+              </div>
+            </div>
+          </div>
+        </div>
+	    <div class="fieldset__row reason-received reason-issues" style="display: none">
+          <div class="field">
+            <label class="field__title">{{ __('The problem') }}</label>
+            <div class="field__item">
+              {% if not digital %}
+              <div><div class="option reason-received">
+              {{ form_radio('problem', 'tracking', null, {'class':'radio', 'id':'problem-tracking'}) }}
+                        <label class="custom-control-label" for="problem-tracking">{{ __('No tracking information') }}</label>
+              </div>
+              </div><div><div class="option reason-received">
+              {{ form_radio('problem', 'dlivery_time', null, {'class':'radio', 'id':'problem-dlivery_time'}) }}
+                        <label class="custom-control-label" for="problem-dlivery_time">{{ __('Delivery time is running out, but package is still in transit') }}</label>
+              </div>
+              </div><div><div class="option reason-received">
+              {{ form_radio('problem', 'wrong_address', null, {'class':'radio', 'id':'problem-wrong_address'}) }}
+                        <label class="custom-control-label" for="problem-wrong_address">{{ __('Package sent to a wrong address') }}</label>
+              </div>
+              </div><div><div class="option reason-received">
+              {{ form_radio('problem', 'returned', null, {'class':'radio', 'id':'problem-returned'}) }}
+                        <label class="custom-control-label" for="problem-returned">{{ __('Package was returned to seller by shipping company') }}</label>
+              </div>
+              {% endif %}
+              </div><div><div class="option reason-issues">
+              {{ form_radio('problem', 'described', null, {'class':'radio', 'id':'problem-described'}) }}
+                  <label class="custom-control-label" for="problem-described">{{ __('Item not as described') }}</label>
+              </div>
+              </div><div><div class="option reason-issues">
+              {{ form_radio('problem', 'damaged', null, {'class':'radio', 'id':'problem-damaged'}) }}
+                  <label class="custom-control-label" for="problem-damaged">{{ __('Damaged item') }}</label>
+              </div>
+              </div><div><div class="option reason-issues">
+              {{ form_radio('problem', 'quantity', null, {'class':'radio', 'id':'problem-quantity'}) }}
+                  <label class="custom-control-label" for="problem-quantity">{{ __('Quantity Shortage') }}</label>
+                    </div></div>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+        <div class="fieldset__row">
+          <div class="field">
+            <label class="field__title" for="proposal">{{ __('My Proposal') }}</label>
+            <div class="field__item">
+                <div class="option reason-return reason-issues">
+              {{ form_radio('proposal', 1, null, {'class':'radio', 'id':'proposal-1'}) }}
+                    <label class="custom-control-label" for="proposal-1">{{ __('Return and Refund') }}</label>
+              </div>
+                <div class="option reason-received reason-issues">
+              {{ form_radio('proposal', 2, null, {'class':'radio', 'id':'proposal-2'}) }}
+                    <label class="custom-control-label" for="proposal-2">{{ __('Full Refund') }}</label>
+              </div>
+                <div class="option reason-issues">
+              {{ form_radio('proposal', 3, null, {'class':'radio', 'id':'proposal-3'}) }}
+                    <label class="custom-control-label" for="proposal-3">{{ __('Partial Refund') }}</label>
+              </div>
+                {% if user.id == order.seller_id %}
+                <div class="option reason-issues">
+              {{ form_radio('proposal', 4, null, {'class':'radio', 'id':'proposal-4'}) }}
+                    <label class="custom-control-label" for="proposal-4">{{ __('Dispute acceptable result') }}</label>
+              </div>
+                {% endif %}
+          </div>
+        </div>
+        <div class="fieldset__row">
+          <div class="field">
+            <label class="field__title" for="note">{{ __('Comment') }}</label>
+            <div class="field__item">{{ form_textarea('notes', null, {'class' : 'textarea', 'id' : 'note', 'rows' : 3}) }}</div>
+          </div>
+          <div class="field">
+            <label class="field__title" for="note">{{ __('Upload Evidence') }}</label>
+            <div class="field__item">{{ form_file('image') }}</div>
+          </div>
+        </div>
+        <div class="form__total">
+            {{ form_submit( __('Open Dispute') , {'class' : 'btn'}) }}
+        </div>
+          {{ form_close() }}
+  </main>
+  <script>
+      document.addEventListener("DOMContentLoaded", function(event) {
+          $('.reason-received > input:radio, .reason-issues > input:radio').prop('disabled', true);
+          {% if user.id == order.seller_id %}
+          $('.reason-received > input:radio, .reason-issues > input:radio').prop('disabled', false);
+          {% endif %}
+
+          $('#reason input:radio').change(function () {
+              $('.reason-received > input:radio, .reason-issues > input:radio').prop('disabled', true);
+              $('.fieldset__row.reason-received.reason-issues').hide();
+              $('.' + $('#reason input:radio:checked').attr('id') + ' > input:radio').prop('disabled', false);
+              $('.fieldset__row.' + $('#reason input:radio:checked').attr('id') ).show();
+          });
+      });
+  </script>
+{% endblock %}

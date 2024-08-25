@@ -1,0 +1,195 @@
+<div data-toggle-name="times_section" class="hidden"
+     style="display: none;background: #fff; position: fixed; top: 0; right: 0; width: 50%; max-width: 360px; height: 100vh; z-index: 300;">
+    <div class="p-0" style="overflow-y: scroll; height: 100vh;">
+        <div id="editor">
+
+        </div>
+    </div>
+</div>
+
+    <h2 >{{ __("Pricing information") }}</h2>
+
+        <div class="fieldset">
+			<h3 class="fieldset__title">{{ __('Deal type') }}</h3>
+            <div class="fieldset__content">
+                <div class="fieldset__row">
+                    <div class="field">
+                        <div class="field__item">
+			{{ form_select('pricing_model_id', pricing_models, null, {'class' : 'select form-controls'}) }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+		</div>
+            
+                <div class="fieldset">
+                    <h3 class="fieldset__title">{{ __("Currency") }}</h3>
+		<div class="fieldset__content">
+			<div class="fieldset__row">
+				<div class="field">
+					<div class="field__items">
+						<div class="field__item">
+                    <div class="input-group mb-0">
+                        {{ form_select('price_in_btc', price_in_btc, price_in_btc_val, {'class' : 'select','id' : 'price_in_btc'}) }}
+                    </div>
+                </div>
+            </div>
+                </div>
+            </div>
+        </div>
+                </div>
+
+
+                <div class="fieldset">
+                    <h3 class="fieldset__title">{{ __("Price",) }}</h3>
+		<div class="fieldset__content">
+			<div class="fieldset__row">
+				<div class="field">
+					<div class="field__items">
+						<div class="field__item">
+                    <div class="input-group mb-0">
+
+                        {{ form_text('price', (listing.price_in_btc ? listing.btc_price : listing.price), {'class' : 'form-control input'}) }}
+
+                        {% if listing.pricing_model.widget != 'request' and not listing.pricing_model.can_seller_enter_per_label %}
+                        <div class="input-group-append">
+                            {% if listing.pricing_model.widget == 'book_date' %}
+                                <span class="input-group-text">{{ __("per") }} {{ listing.pricing_model.per_label_buyer_display }}</span>
+                            {%  elseif not listing.pricing_model.per_label_buyer_display %}
+
+                            {%  else %}
+                                <span class="input-group-text">{{ __("per") }} {{ listing.pricing_model.per_label_buyer_display }}</span>
+                            {%  endif %}
+                        </div>
+                        {%  endif %}
+                    </div>
+                </div>
+            </div>
+                </div>
+            </div>
+        </div>
+                </div>
+			
+			{% if listing.pricing_model.can_seller_enter_per_label %}
+            
+                    <div class="fieldset">
+                        <h3 class="fieldset__title">{{ __("Unit display name") }} <small class="text-muted">{{ __("(optional)") }}</small></h3>
+		<div class="fieldset__content">
+			<div class="fieldset__row">
+				<div class="field">
+					<div class="field__items">
+						<div class="field__item">
+                        {{ form_text('price_per_unit_display', null, {'class' : 'form-control input', 'style':'border-lefts: 1px dashed #eee', 'placeholder':__("e.g. per...")}) }}
+                        <small class="form-text text-muted">
+                            {{ __("e.g. per week, per kg, per box, per unit") }}
+                        </small>
+                    </div>
+			</div>
+                </div>
+            </div>
+        </div>
+                    </div>
+			{%  endif %}
+			
+			{% if listing.pricing_model.widget != 'request' %}
+			
+                    <div class="fieldset">
+					<h3 class="fieldset__title">{{ listing.pricing_model.quantity_label_buyer_display|capitalize|default(__('Stock')) }}</h3>
+		<div class="fieldset__content">
+			<div class="fieldset__row">
+				<div class="field">
+					<div class="field__items">
+						<div class="field__item">
+                        {{ form_number('stock', null, {'class' : 'form-control input'}) }}
+                    </div>
+			</div>
+                </div>
+            </div>
+        </div>
+                    </div>
+            {%  endif %}
+
+                    <div class="fieldset">
+					<h3 class="fieldset__title">{{ __('Minimum rating for buyer') }} ({{ __('number of deals') }})</h3>
+		<div class="fieldset__content">
+			<div class="fieldset__row">
+				<div class="field">
+					<div class="field__items">
+						<div class="field__item">
+                        {{ form_number('buyer_rating', listing.meta.buyer_rating, {'class' : 'form-control input',}) }}
+                    </div>
+			</div>
+                </div>
+            </div>
+        </div>
+                    </div>
+
+            {% if listing.pricing_model.widget == 'book_date' %}
+            
+                <div class="fieldset">
+                    <h3 class="fieldset__title">{{ __('Minimum rent period') }} <small class="text-muted">({{ _p(listing.pricing_model.duration_name) }})</small></h3>
+		<div class="fieldset__content">
+			<div class="fieldset__row">
+				<div class="field">
+					<div class="field__items">
+						<div class="field__item">
+                    {{ form_text('min_duration', null, {'class' : 'form-control input'}) }}
+
+                </div>
+            </div>
+                </div>
+            </div>
+        </div>
+                </div>
+            
+                <div class="fieldset">
+                    <h3 class="fieldset__title">{{ __('Maximum rent period') }} <small class="text-muted">({{ _p(listing.pricing_model.duration_name) }})</small></h3>
+		<div class="fieldset__content">
+			<div class="fieldset__row">
+				<div class="field">
+					<div class="field__items">
+						<div class="field__item">
+                    {{ form_number('max_duration', null, {'class' : 'form-control input'}) }}
+                </div>
+            </div>
+                </div>
+            </div>
+        </div>
+                </div>
+            {% endif %}
+
+
+            {% if listing.pricing_model.widget == 'book_time' %}
+            
+                <div class="fieldset">
+                    <h3 class="fieldset__title">{{ __("Length of") }} {{(listing.pricing_model.duration_name)}} (mins)</h3>
+		<div class="fieldset__content">
+			<div class="fieldset__row">
+				<div class="field">
+					<div class="field__items field__items--line-x2">
+						<div class="field__item">
+                    {{ form_text('session_duration', null, {'class' : 'form-control input'}) }}
+                    <small id="setupTimes" class="form-text text-muted">
+                        <a href="#setupTimes" data-toggle-target="times_section"  ic-get-from="{{route('create.times', listing)}}" ic-target="#editor" ic-select-from-response="#editor-area-wrapper" ic-replace-target="true">{{ __("Set-up availability") }}</a></small>
+
+                </div>
+                <div></div>
+            </div>
+                </div>
+            </div>
+        </div>
+                </div>
+            {% endif %}
+
+<div class="fieldset">
+			<h3 class="fieldset__title">{{ __('Automatic comment for paid deal') }}<br><small class="text-muted">{{ __("You can use \"---\" as delimiter for split your message and send one part as comment for every sold unit of the good. Without the delimiter your message will be repeted for all sold units.") }}</small></h3>
+            <div class="fieldset__content">
+                <div class="fieldset__row">
+                    <div class="field">
+                        <div class="field__item">
+                            {{ form_textarea('deal_comment', null, {'class' : 'textarea'}) }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+		</div>

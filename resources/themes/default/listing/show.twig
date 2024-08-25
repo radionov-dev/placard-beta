@@ -1,0 +1,180 @@
+{% extends "layouts.app" %}
+
+{% block content %}
+  <div class="content--sideLeft">
+	<div class="content__header">
+      {% if not is_snapshot %}
+	  <div class="breadcrumb">
+		  <a href="{{route('home')}}" class="breadcrumb__item">{{ __("Home") }}</a>
+		  {% for breadcrumb in breadcrumbs %}
+		  <a href="{{ route('browse', {'category': breadcrumb.id}) }}" class="breadcrumb__item">{{ _l(breadcrumb.name) }}</a>
+		  {% endfor %}
+		  <a href="{{ route('browse', {'category': listing.category.id}) }}" class="breadcrumb__item">{{_l(listing.category.name)}}</a>
+	  </div>
+      {% endif %}
+	</div>
+	<div class="content__side-bar">
+		{% for facet in facets if facet.search_ui == 'category' %}
+			{% include 'browse.filters.'~facet.search_ui ignore missing %}
+		{% endfor %}
+		{% if auth_check() and (listing.user_id == auth_user().id or auth_user().can('edit listing')) %}
+			
+		{% endif %}
+	</div>
+
+	<main class="content__main">
+	<div class="cardFull">
+
+	<div class="form dd-form" id="form">
+	{% include 'notifications' %}
+	<h1 class="cardFull__title">
+		{{listing.title}}
+      {% if not is_snapshot %}
+		{% if auth_check() and (listing.user_id == auth_user().id or auth_user().can('edit listing')) %}
+			<strong class="badge badge-info product__value">{{ (listing.is_published)?__('Published'):__('Unpublished') }}</strong>
+		{% endif %}
+      {% endif %}
+	</h1>
+	{% if auth_check() and not is_snapshot and (listing.user_id == auth_user().id or auth_user().can('edit listing')) %}
+	<div class="cardFull__buttons">
+		<a class="badge badge-secondary" href="{{listing.edit_url}}">{{ __("Edit listing") }}</a>
+
+		{% if auth_user().can('disable listing') %}
+			<a data-turbolinks="false" ic-indicator="#listing-panel-indicator" class="badge badge-secondary" id="spotlight-listing" ic-get-from="{{ route('listing.spotlight', [listing, listing.slug]) }}" ic-target="#spotlight-listing" ic-select-from-response="#spotlight-listing" href="#">{{ (listing.spotlight)?__('Remove from spotlight'):__('Add to spotlight')}}</a>
+			<a data-turbolinks="false" ic-indicator="#listing-panel-indicator" class="badge badge-{{ (listing.is_verified)?'secondary':'danger'}}" id="verify-listing" ic-get-from="{{ route('listing.verify', [listing, listing.slug]) }}" ic-target="#listing-panel" ic-select-from-response="#listing-panel" href="#">{{ (listing.is_verified)?__('Disable listing'):__('Approve listing')}}</a>
+		{% endif %}
+
+
+		<i id="listing-panel-indicator" class="fa fa-spinner fa-spin" style="display: none"></i>
+	</div>
+	{% endif %}
+		{% include 'listing.partials.overview' %}
+        <div class="cardFull__data" style=" margin-top: -8px; margin-bottom: 10px; ">
+        <div class="group__minor">{{ __('Deal type') }}:</div>
+        <div class="group__major">{{listing.pricing_model.name}} {#{ (listing.pricing_model.name == 'mediation' or listing.pricing_model.name == 'Mediation') ? 'postpayment' : listing.pricing_model.name }#}</div>
+        </div>
+      {% if is_snapshot %}
+      <div class="cardFull__data cardData" id="form-selector" >
+              {% if listing.variant_options %}
+            {% for name,variation in listing.variant_options %}
+                <div class="fieldset__row">
+                    <div class="field__title">
+                        {{ _l(name) }}
+                    </div>
+                    <div class="field__item">
+                        {{  form_select('variant['~name~']', {'' : __(' - Select - ')} + array_combine(variation, variation), input_get('variant.'~name), {'class' : 'input', 'required':'required'}) }}
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+        <div class="cardData__item cardTable">
+					<div class="cardTable__header">
+						<div class="cardTable__cell">{{ __('Name') }}</div>
+						<div class="cardTable__cell">{{ __('Price') }}</div>
+						<div class="cardTable__cell">{{ __('Qantity') }}</div>
+					</div>
+            <div class="cardTable__row dd-line">
+	<div class="cardTable__cell">-</div>
+	<div class="cardTable__cell">{{ format_to_money(listing.price, listing.currency, current_currency()) }}</div>
+	<div class="cardTable__cell">
+        {% if listing.stock >= 1 %}
+                    {{ form_select('quantity', array_combine(range(1, listing.stock), range(1, listing.stock)), input_get('quantity'), {'required':'required'}) }}
+        {% else %}
+            
+            {{ form_hidden('quantity', 1) }}
+        {% endif %}
+    </div>
+    </div>
+        </div>
+        {% endif %}
+        </div>
+      {% else %}
+	{% include 'listing.partials.sidebar' %}
+      {% endif %}
+	</div>
+	</div>
+
+	<div class="box">
+        <h3 class="box__title">{{ __("Overview") }}</h3>
+        <div class="box__content">{{ listing.description | raw }}</div>
+    </div>
+
+
+		{% include 'listing.partials.features' %}
+
+      {% if not is_snapshot %}
+		<div class="reviews" id="profile-reviews">
+              <div class="reviews__header">
+                <div class="reviews__title">
+                    {{ __("Reviews") }}
+					<span class="fa fa-spinner fa-spin fa-2x text-muted" id="reviews-spinner" style="display: none"></span>
+                </div>
+                <div class="reviews__sort">
+                    <a href="#profile-reviews" ic-indicator="#reviews-spinner" ic-select-from-response="#profile-reviews" ic-target="#profile-reviews" ic-get-from="{{ route('listing', {listing: listing, slug: listing.slug, rate: 3}) }}" ic-trigger-on="click" class="reviews__sortItem {% if rate == 3 %}active{% endif %}">{{ __("Positive") }}</a>
+                    <a href="#profile-reviews" ic-indicator="#reviews-spinner" ic-select-from-response="#profile-reviews" ic-target="#profile-reviews" ic-get-from="{{ route('listing', {listing: listing, slug: listing.slug, rate: 1}) }}" ic-trigger-on="click" class="reviews__sortItem {% if rate == 1 %}active{% endif %}">{{ __("Negative") }}</a>
+                    <a href="#profile-reviews" ic-indicator="#reviews-spinner" ic-select-from-response="#profile-reviews" ic-target="#profile-reviews" ic-get-from="{{ route('listing', {listing: listing, slug: listing.slug}) }}" ic-trigger-on="click" class="reviews__sortItem {% if not rate %}active{% endif %}">{{ __("All") }}</a>
+                </div>
+              </div>
+			{% if comments|length > 0 %}
+				{% for comment in comments %}
+					<div class="review">
+						<a href="{{ comment.commenter.url }}" class="userBlock" style="margin: 0px;padding:0 8px 0 0; max-width: 190px;">
+                          {#<div class="userBlock__pic">
+                            <img src="{{ comment.commenter.avatar }}" alt="{{ comment.commenter.display_name }}" class="userBlock__img" />
+                          </div>#}
+                          <div class="userBlock__content">
+                            <div class="userBlock__name" style="word-break: break-word;">{{ comment.commenter.display_name }}
+							  {{ include('components.star_rating', {rating: comment.commenter.averageRate(), total: comment.commenter.totalCommentCount(), date: comment.commenter.created_at.format('Y.m') }) }}</div>
+                          </div>
+                        </a>
+                    <div class="review__content review__text" style=" float: right; ">
+                        <div class="review__text">{{comment.feedback}}</div>
+                        <div class="review__info">
+                            <!--a href="{{route('listing', {'id' : comment.listing, 'slug' : str_slug(comment.listing.title)})}}" class="review__infoPrice">{{comment.listing.title}}</a-->
+                            <span class="review__infoPrice">{{ (comment.listing.price_in_btc ? format_btc(comment.listing.btc_price, 'BTC') : format_btc(comment.listing.price, comment.listing.currency)) | raw }}</span>
+                            <div class="review__infoTime">{{comment.created_at.format('Y-m-d')}}</div>
+                        </div>
+                        <div class="review__status">
+                            <span class="status status--{{ comment.rating == 3 ? 'like' : 'dislike' }}"></span>
+                        </div>
+                    </div>
+                    <div class="review__total" style="clear: both;">
+                        {% if comment.getMeta('replay') or comment.seller_id == auth_user().id %}
+							<form method="PUT" class="review__text" action="{{ route('account.orders.feedback_replay', order) }}" ic-put-to="{{ route('account.orders.feedback_replay', order) }}" ic-indicator="#reviews-spinner" ic-select-from-response="#profile-reviews" ic-target="#profile-reviews" style="float: right;color: #333333">
+                            <h4 style="margin: 0">Reply:</h4>
+								{% if not comment.getMeta('replay') %}
+									{{ csrf_field() }}
+									<input type="hidden" name="comment_id" value="{{ comment.id }}">
+									<textarea name="replay" style="min-height: unset;width: calc(100% - 103px); float: left;" rows="5" class="textarea" ></textarea>
+									<button type="submit" class="button headerSearch__submit">{{ __("Submit") }}</button>
+								{% else %}
+									{{ comment.getMeta('replay') }}
+								{% endif %}
+                        </form>
+						{% endif %}
+                     </div>
+                     <div style="clear: both;"></div>
+                </div>
+				{% endfor %}
+              {{comments.links() | raw }}
+              {% else %}
+				<p>No reviews</p>
+			{% endif %}
+            </div>
+      {% endif %}
+
+
+		{% if listing.tags %}
+			<br><br><br>
+			<div class="box">
+	<h3 class="box__title">{{ __("Tags") }}</h3>
+	<div class="box__content">
+		{% for tag in listing.tags %}
+			<a href="{{ route('browse', {'tagged' : tag}) }}" class="link">{{ tag }}</a>
+		{% endfor %}
+	</div>
+	</div>
+		{% endif %}
+	</main>
+	</div>
+{% endblock %}

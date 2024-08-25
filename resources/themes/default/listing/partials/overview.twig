@@ -1,0 +1,9 @@
+{% if listing.carousel | length >= 1 %}
+<div class="cardFull__gallery">
+    <div class="fotorama" data-nav="thumbs" data-arrows="false" data-click="false" data-fit="contain" data-allowfullscreen="true">
+        {% for k,image in listing.carousel %}
+        <img src="{{image.photo}}" data-full="{{image.photo}}" alt="{{listing.title}}" width="300" />
+        {% endfor %}
+    </div>
+</div>
+{% endif %}

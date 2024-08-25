@@ -1,0 +1,159 @@
+{% extends "account.master" %}
+
+{% block user_area %}
+    <main class="content__main">
+        <div class="catalogNew">
+            {% include 'notifications' %}
+            {{ form_model(listing, {'route' : ['create.update', listing], 'class' : 'form', 'method' : 'PUT' }) }}
+            <div style="display: inline-block;
+    vertical-align: middle;
+    min-width: 47%;" >
+            <h2>{{ listing.title }} <small><a href="{{ listing.url }}" class="small">{{ __("(view)") }}</a> {% if not listing.is_published %}{{ __("unpublished") }}{% endif %}</small>
+            </h2>
+            <span>
+            <span >{{ __("Deal type") }}: {{ listing.pricing_model.seller_label }}</span><br>
+            <span>{{ __("Category") }}: {{ listing.category.name }}</span>
+                </span>
+            </div>
+
+            <div style="display: inline-block;vertical-align: middle;">
+            {% if not listing.is_published %}
+                <input type="submit" name="publish" value="{{ __('Publish')  }}" class="btn btn--big">
+            {% else %}
+                {% if listing.is_verified %}
+                    {% if not module_enabled('listingfee') and not module_enabled('memberships') %}
+                        {% if listing.is_draft %}
+                            <input type="submit" name="undraft" value="{{ __('Re-enable') }}" class="btn btn--big">
+                        {% else %}
+                            <input type="submit" name="draft" value="{{ __('Unpublish') }}" class="btn btn--big">
+                        {% endif %}
+                    {% else %}
+                        <div class="float-right text-center">
+                            {% if listing.expires_at %}
+                                <small class="text-muted ">{{ __("Expires") }} {{ listing.expires_at |date("jS M 'y") }}</small><br />
+                            {% endif %}
+                            {% if listing.is_draft %}
+                                <input type="submit" name="undraft" value="{{ __('Re-enable') }}" class="btn  btn-outline-danger btn-sm">
+                            {% else %}
+                                <input type="submit" name="draft" value="{{ __('Disable') }}" class="btn  btn-outline-danger btn-sm">
+                                <input type="submit" name="renew" value="{{ __('Renew') }}" class="btn  btn-outline-success btn-sm">
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                {% else %}
+                    <input type="button" name="draft" value="{{ __('Pending Verification') }}" class="btn btn--big" style="cursor: default">
+                {% endif %}
+            {% endif %}
+            </div>
+            {% include 'create.partials.details' %}
+
+            {%  if listings_form | length > 0 %}
+                {% include 'create.partials.additional' %}
+            {% endif %}
+            {% include 'create.partials.pricing_details' %}
+            {% include 'create.partials.pricing_additional' %}
+            {% include 'create.partials.pricing_shipping' %}
+            {% include 'create.partials.pricing_variants' %}
+            {% include 'create.partials.services' %}
+
+            {% include 'create.partials.images' %}
+
+            {% if listing.pricing_model.meta.bd_type == 'mediation' %}
+            <div class="fieldset">
+                <div class="card-body" id="default_shippings">
+                    <h3 style="margin-bottom: 0"><label><input type="checkbox" name="is_return" value="1" {% if listing.is_return %}checked="checked"{% endif %}> {{ __('Return for any reason') }}</label> <small class="text-muted">({{ __("Allow a buyer to return the goods to you without explaining a reason.") }})</small></h3>
+                </div>
+            </div>
+            {% endif %}
+            {% if listing.is_draft or not listing.is_published %}
+            <div class="fieldset">
+				<div class="fieldset__content">
+					<div class="fieldset__row">
+						<div class="field">
+							<label for="captcha" class="field__title">{{ __("Captcha") }}</label>
+							<div class="field__item">
+								<input type="text" id="captcha" name="captcha" class="input" autocomplete="off" style="display: inline-block; vertical-align: top; width: auto;" required>
+                                {{ captcha|raw }}<br>
+                                {% if errors.has('captcha') %}
+                                    <small class="form-control-feedback invalid-feedback">{{ errors.first('captcha') }}</small>
+                                {% endif %}
+							</div>
+						</div>
+					</div>
+                </div>
+            </div>
+            {% endif %}
+            <div class="form__total">
+                {% if not listing.is_published %}
+                    <input type="submit" value="{{ __('Save listing')  }}" class="btn btn--big float-left">
+                    <input type="submit" name="publish" value="{{ __('Publish')  }}" class="btn btn--big btn--accent float-right">
+                {% else %}
+                    <input type="submit" value="{{ __('Save listing')  }}" class="btn btn--big btn--accent float-right">
+               
+              
+                {% if listing.is_verified %}
+                    {% if not module_enabled('listingfee') and not module_enabled('memberships') %}
+                        {% if listing.is_draft %}
+                            <input type="submit" name="undraft" value="{{ __('Re-enable') }}" class="btn btn--big float-right">
+                        {% else %}
+                            <input type="submit" name="draft" value="{{ __('Unpublish') }}" class="btn btn--big float-right">
+                        {% endif %}
+                    {% else %}
+                            {% if listing.is_draft %}
+                                <input type="submit" name="undraft" value="{{ __('Re-enable') }}" class="btn  btn-outline-danger btn--big float-right">
+                            {% endif %}
+                    {% endif %}
+                {% else %}
+                    <input type="button" name="draft" value="{{ __('Pending Verification') }}" class="btn btn--big float-right" style="cursor: default">
+                {% endif %}
+              {% endif %}
+            </div>
+            {{ form_close() }}
+        </div>
+    </main>
+{% endblock %}
+{% block scripts %}
+    <script>
+
+        function show_tags() {
+            $('.tags').each(function (i, obj) {
+                if ($(obj)[0].selectize !== undefined) {
+                    $(obj)[0].selectize.destroy();
+                }
+            });
+
+            $('.tags').selectize({
+                delimiter: ',',
+                persist: false,
+                create: function (input) {
+                    return {
+                        value: input,
+                        text: input
+                    }
+                }
+            });
+        }
+
+        $('.repeater-default').repeater({initEmpty: false, show: function () {
+                $(this).slideDown();
+                $(this).find('input').each(function() {
+                    if($(this).attr('value') != "") {
+                        $(this).val($(this).attr('value'));
+                    }
+                });
+
+            }});
+        $('.repeater-variation-option').repeater({
+            show: function () {
+                show_tags();
+                $(this).slideDown();
+            }
+        })
+        show_tags();
+
+
+    </script>
+    {% endblock %}
+
+
+

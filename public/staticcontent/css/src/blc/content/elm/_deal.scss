@@ -1,0 +1,12 @@
+.dealList{}
+.dealList__item{}
+.dealDetail{}
+.dealDetail__header{
+	margin-bottom: 40px;
+}
+.dealDetail__content{
+	padding-left: 188px;
+	@include media(custom, 0px, 920px) {
+		padding-left: 0;
+	}
+}

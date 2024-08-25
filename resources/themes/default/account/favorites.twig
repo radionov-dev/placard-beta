@@ -1,0 +1,38 @@
+{% extends "layouts.app" %}
+
+{% block search_bar %}
+{% endblock %}
+
+{% block content %}
+    <div class=" content--sideLeft" id="listings">
+        <div class="content__header">
+            <div class="breadcrumb">
+                {% for breadcrumb in breadcrumbs %}
+                    <a href="{{ route(setting('marketplace_index'), {'category': breadcrumb.id}) }}" class="breadcrumb__item">{{ _l(breadcrumb.name) }}</a>
+                {% endfor %}
+            </div>
+        </div>
+
+        <aside class="content__side-bar">
+            {% for facet in facets if facet.search_ui == 'category' %}
+                {% include 'browse.filters.'~facet.search_ui ignore missing %}
+            {% endfor %}
+        </aside>
+
+        <main class="content__main">
+            <div class="catalog js-catalog catalog--line" id="listing_results">
+                {% if listings is defined and listings.count() > 0 %}
+                    {% include 'browse.partials.list' %}
+                {% else %}
+                    <div class="catalog__empty">{{ __("Sorry, no results found.") }}</div>
+                {% endif %}
+            </div>
+            <div id="indicator" style="display: none; text-align: center; background: rgba(255,255,255, 0.75); width: 100%; height: 100%; position: absolute; top: 0; left: 0;">
+                <div class="loader">{{ __("Loading...") }}</div>
+            </div>
+        </main>
+    </div>
+{% endblock %}
+
+
+

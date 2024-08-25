@@ -1,0 +1,24 @@
+.list{
+	width: 100%;
+	font-size: 0;
+}
+.list__item{
+	display: inline-block;
+	vertical-align: middle;
+	margin-bottom: 10px;
+}
+.list--cell-4{
+	.list__item{
+		width: 25%;
+		@include media(phone-tablet) {
+			width: 33.333%;
+		}
+		@include media(phone-phablet) {
+			width: 50%;
+		}
+		@include media(phone-smartphone) {
+			width: 100%;
+			padding-left: 30px;
+		}
+	}
+}

@@ -1,0 +1,18 @@
+{% if facet.options %}
+
+    <div class="filter">
+        <div class="filter__title">{{ _l(facet.name) }}</div>
+        <div class="filter__parametrs">
+            <div class="filter__parametr">
+                <input class="filter__input" id="{{ facet.field }}0" name="{{ facet.field }}" type="radio" onchange="location='{{ request().fullUrlWithQuery({ (facet.field): null}) }}'" {% if not input_get(facet.field) %}checked{% endif %} />
+                <label class="filter__label" onclick="location='{{ request().fullUrlWithQuery({ (facet.field): null}) }}'" for="{{ facet.field }}0">{{ __("All") }}</label>
+            </div>
+            {% for option in facet.options %}
+                <div class="filter__parametr">
+                    <input class="filter__input" id="{{ facet.field }}{{ option.value }}" name="{{ facet.field }}" type="radio" onchange="location='{{ request().fullUrlWithQuery({(facet.field) : option.value}) }}'" {% if input_get(facet.field) == option.value %}checked{% endif %} />
+                    <label class="filter__label" onclick="location='{{ request().fullUrlWithQuery({(facet.field) : option.value}) }}'" for="{{ facet.field }}{{ option.value }}">{{ option.name |trim('"') }}</label>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endif %}

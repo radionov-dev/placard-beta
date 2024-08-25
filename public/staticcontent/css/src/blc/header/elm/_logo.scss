@@ -1,0 +1,13 @@
+.headerLogo {
+	float: left;
+	margin-top: 12px;
+	width: $header-logo-width;
+}
+
+	.headerLogo__link {}
+
+		.headerLogo__pic {
+			display: block;
+			width: 140px;
+			height: 27px;
+		}

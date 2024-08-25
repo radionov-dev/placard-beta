@@ -1,0 +1,39 @@
+{% extends "layouts.app" %}
+
+{% block search_bar %}{% endblock %}
+
+{% block content %}
+  <div class="content__header">
+      <h3 class="content__title">{{ __("Reset Password") }}</h3>
+  </div>
+  <main class="content__main">
+    {% if session_has('status') %}
+    <div class="alert alert-success">
+      {{ session('status') }}
+    </div>
+    {% endif %}
+    <div class="popup" style=" z-index: 0; ">
+      <form method="POST" action="{{ route('password.email') }}" class="form">
+        {{ csrf_field() }}
+        <div class="fieldset" id="resetpassword_form">
+		  <div class="fieldset__content">
+			<div class="fieldset__row">
+              <div class="field">
+                <label class="field__title" for="email">{{ __("Address") }}</label>
+                <div class="field__item">
+                  <input class="input{{errors.has('email') ? ' is-invalid' : '' }}" type="text" id="email" name="email" value="{{ old('email') }}" placeholder="Email/BitMessage" required autofocus>
+                  {% if errors.has('email') %}
+                  <small class="form-control-feedback invalid-feedback">{{errors.first('email') }}</small>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+			<div class="form__total">
+			  <input class="btn btn--accent" type="submit" value="{{ __("Send Password Reset Link") }}">
+			</div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </main>
+{% endblock %}

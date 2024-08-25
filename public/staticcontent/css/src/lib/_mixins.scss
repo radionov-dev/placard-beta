@@ -1,0 +1,262 @@
+@mixin container {
+	& {
+		margin-right: auto;
+		margin-left: auto;
+		padding-right: $gap;
+		padding-left: $gap;
+		max-width: $width-max;
+		min-width: 320px;
+		@include media(phone-phablet) {
+			padding-right: $gap / 2;
+			padding-left: $gap / 2;
+		}
+		@include media(phone) {
+			padding-right: $gap / 4;
+			padding-left: $gap / 4;
+		}
+	}
+}
+@mixin deleteContainer{
+	& {
+		width: 100%;
+		padding: 0;
+		max-width: 100%;
+	}
+}
+
+@mixin clearfix {
+	& {
+		&:before,
+		&:after {
+			content: ' ';
+			display: block;
+		}
+		&:after {
+			clear: both;
+		}
+	}
+}
+
+@mixin links ($link, $hover:false, $visited:false, $active:false) {
+    & {
+        color: $link;
+
+		@if ($visited) {
+	        &:visited {
+	            color: $visited;
+	        }
+    	}
+		@if ($hover) {
+	        &:hover {
+	            color: $hover;
+	            text-decoration: underline;
+	        }
+        }
+		@if ($active) {
+	        &:active, &:focus {
+	            color: $active;
+	        }
+        }
+    }
+}
+
+@mixin appearance {
+	& {
+		-webkit-appearance: none;
+		-moz-appearance: none;
+		-ms-appearance: none;
+		-o-appearance: none;
+		appearance: none;
+	}
+}
+
+$phone-to: 480px;
+
+$smartphone-from: $phone-to + 1;
+$smartphone-to: 640px;
+
+$phablet-from: $smartphone-to + 1;
+$phablet-to: 768px;
+
+$tablet-from: $phablet-to + 1;
+$tablet-to: 1024px;
+
+$notebook-from: $tablet-to + 1;
+$notebook-to: 1280;
+
+$desktop-from: $notebook-to + 1;
+$desktop-to: 1600px;
+
+$hires-from: $desktop-to + 1;
+
+
+@mixin media($device, $min:false, $max:false) {
+	// for hires
+	@if($device == "hires"){
+		@media screen and (min-width:$hires-from){
+			@content;
+		}
+	}
+
+	// for desktop and from desktop
+	@if($device == "desktop-hires"){
+		@media screen and (min-width:$desktop-from) and (max-width:$hires-to){
+			@content;
+		}
+	}
+	@if($device == "desktop"){
+		@media screen and (min-width:$desktop-from) and (max-width:$desktop-to){
+			@content;
+		}
+	}
+
+	// for notebook and from notebook
+	@if($device == "notebook-hires"){
+		@media screen and (min-width:$notebook-from){
+			@content;
+		}
+	}
+	@if($device == "notebook-desktop"){
+		@media screen and (min-width:$notebook-from) and (max-width:$desktop-to){
+			@content;
+		}
+	}
+	@if($device == "notebook"){
+		@media screen and (min-width:$notebook-from) and (max-width:$notebook-to){
+			@content;
+		}
+	}
+
+	// for tablet and from tablet
+	@if($device == "tablet-hires"){
+		@media screen and (min-width:$tablet-from){
+			@content;
+		}
+	}
+	@if($device == "tablet-desktop"){
+		@media screen and (min-width:$tablet-from) and (max-width:$desktop-to){
+			@content;
+		}
+	}
+	@if($device == "tablet-notebook"){
+		@media screen and (min-width:$tablet-from) and (max-width:$notebook-to){
+			@content;
+		}
+	}
+	@if($device == "tablet"){
+		@media screen and (min-width:$tablet-from) and (max-width:$tablet-to){
+			@content;
+		}
+	}
+
+	// for phablet and from phablet
+	@if($device == "phablet-hires"){
+		@media screen and (min-width:$phablet-from){
+			@content;
+		}
+	}
+	@if($device == "phablet-desktop"){
+		@media screen and (min-width:$phablet-from) and (max-width:$desktop-to){
+			@content;
+		}
+	}
+	@if($device == "phablet-notebook"){
+		@media screen and (min-width:$phablet-from) and (max-width:$notebook-to){
+			@content;
+		}
+	}
+	@if($device == "phablet-tablet"){
+		@media screen and (min-width:$phablet-from) and (max-width:$tablet-to){
+			@content;
+		}
+	}
+	@if($device == "phablet"){
+		@media screen and (min-width:$phablet-from) and (max-width:$phablet-to){
+			@content;
+		}
+	}
+
+	// for smartphone and from smartphone
+	@if($device == "smartphone-hires"){
+		@media screen and (min-width:$smartphone-from){
+			@content;
+		}
+	}
+	@if($device == "smartphone-desktop"){
+		@media screen and (min-width:$smartphone-from) and (max-width:$desktop-to){
+			@content;
+		}
+	}
+	@if($device == "smartphone-notebook"){
+		@media screen and (min-width:$smartphone-from) and (max-width:$notebook-to){
+			@content;
+		}
+	}
+	@if($device == "smartphone-tablet"){
+		@media screen and (min-width:$smartphone-from) and (max-width:$tablet-to){
+			@content;
+		}
+	}
+	@if($device == "smartphone-phablet"){
+		@media screen and (min-width:$smartphone-from) and (max-width:$phablet-to){
+			@content;
+		}
+	}
+	@if($device == "smartphone"){
+		@media screen and (min-width:$smartphone-from) and (max-width:$smartphone-to){
+			@content;
+		}
+	}
+
+	// for phone and from phone
+	@if($device == "phone-hires"){
+		@content;
+	}
+	@if($device == "phone-desktop"){
+		@media screen and (max-width:$desktop-to){
+			@content;
+		}
+	}
+	@if($device == "phone-notebook"){
+		@media screen and (max-width:$notebook-to){
+			@content;
+		}
+	}
+	@if($device == "phone-tablet"){
+		@media screen and (max-width:$tablet-to){
+			@content;
+		}
+	}
+	@if($device == "phone-phablet"){
+		@media screen and (max-width:$phablet-to){
+			@content;
+		}
+	}
+	@if($device == "phone-smartphone"){
+		@media screen and (max-width:$smartphone-to){
+			@content;
+		}
+	}
+	@if($device == "phone"){
+		@media screen and (max-width:$phone-to){
+			@content;
+		}
+	}
+
+	// custom
+	@if($device == "custom"){
+		@if($min != "false" && $max != "false"){
+			@media screen and (min-width:$min) and (max-width:$max){
+				@content;
+			}
+		}@else if($min != "false"){
+			@media screen and (min-width:$min){
+				@content;
+			}
+		}@else if($max != "false"){
+			@media screen and (max-width:$max){
+				@content;
+			}
+		}
+	}
+}

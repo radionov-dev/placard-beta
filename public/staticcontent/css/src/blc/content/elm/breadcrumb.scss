@@ -1,0 +1,26 @@
+.breadcrumb{
+	margin-top: 30px;
+	margin-bottom: 20px;
+}
+.breadcrumb__item{
+	display: inline-block;
+	vertical-align: middle;
+	color: $color-minor;
+	margin-top: 8px;
+	&:after{
+		content: "";
+		display: inline-block;
+		vertical-align: middle;
+		width: 6px;
+		height: 10px;
+		background-image: url(/staticcontent/img/icon/arrow-smal-minor.png);
+		background-size: 6px 10px;
+		margin-left: 11px;
+		margin-right: 11px;
+	}
+	&:last-child{
+		&:after{
+			display: none;
+		}
+	}
+}

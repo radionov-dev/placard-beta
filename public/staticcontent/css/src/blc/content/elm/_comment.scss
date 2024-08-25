@@ -1,0 +1,39 @@
+.comments{}
+.commentNew{
+	border-bottom: 1px solid #ececed;
+}
+.commentNew.noSeparator{
+	border-bottom: none;
+}
+.commentNew__header{}
+.commentNew__title{
+	margin-top: 0;
+	margin-bottom: 10px;
+}
+.commentNew__description{}
+.commentNew__content{
+	margin-top: 20px;
+}
+.commentNew__total{
+	text-align: right;
+	margin-top: 15px;
+	margin-bottom: 25px;
+}
+.commentNew__tooltip{
+	font-size: 12px;
+	color: $color-minor;
+	margin-right: 10px;
+}
+.comment{
+	margin-top: 20px;
+	margin-bottom: 35px;
+	&:first-of-type{
+		border-top: 1px solid #ececed;
+	}
+}
+.comment__autor{
+	margin-top: 5px;
+}
+.comment__date{
+	color: $color-minor;
+}

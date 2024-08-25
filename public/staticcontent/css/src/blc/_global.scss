@@ -1,0 +1,17 @@
+html,
+body {
+	font-size: $font-size;
+	height: 1px;
+	min-height: 100%;
+	color: $color-text;
+}
+
+body {
+	line-height: $font-height;
+	font-family: $font-family;
+}
+
+a{
+	@include links($color-accent, $color-accent-dark);
+	text-decoration: none;
+}

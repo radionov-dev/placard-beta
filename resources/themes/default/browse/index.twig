@@ -1,0 +1,170 @@
+{% extends "layouts.app" %}
+
+{% block search_bar %}
+{% endblock %}
+
+{% block content %}
+<div class=" content--sideLeft" id="listings">
+  <div class="content__header">
+    <div class="breadcrumb">
+	{% for breadcrumb in breadcrumbs %}
+      <a href="{{ route(setting('marketplace_index'), {'category': breadcrumb.id}) }}" class="breadcrumb__item">{{ _l(breadcrumb.name) }}</a>
+    {% endfor %}
+    </div>
+    <form class="filters" action="{{ route(setting('marketplace_index')) }}" method="GET" id="search-sidebar">
+        {{ form_hidden( 'q', input_get('q')) }}
+        {{ form_hidden( 'view', view) }}
+        {{ form_hidden( 'location', input_get('location', session('location'))) }}
+        {{ form_hidden('lat', input_get('lat', session('lat')), {'class' : 'lat'}) }}
+        {{ form_hidden('lng', input_get('lng', session('lng')), {'class' : 'lng'}) }}
+        {{ form_hidden('bounds', input_get('bounds', session('bounds')), {'class' : 'bounds'}) }}
+      <div class="filters__group-left">
+      {% set break = false %}
+      {% for facet in facets if facet.search_ui != 'category' and not break %}
+        {% include 'browse.filters.'~facet.search_ui ignore missing %}
+        {% set break = facet.field %}
+      {% endfor %}
+      </div>
+      <div class="filters__group-right">
+      {% for facet in facets if facet.search_ui != 'category' and facet.field != break %}
+          {% include 'browse.filters.'~facet.search_ui ignore missing %}
+      {% endfor %}
+        <div class="filter">
+            <div class="filter__parametrs">
+            <select name="sort" class="select" style="max-height: 36px;appearance: auto;margin-bottom: 2px;" onchange="window.location.href='{{ request().fullUrlWithQuery({"sort" : ''}) }}' + $(this).val();">
+                {% for value, option in sort_options %}
+                    <option value="{{ value | trim('"') }}" {{ (sort == value)?'selected':'' }}>{{ option |trim('"') }}</option>
+                {% endfor %}
+            </select>
+            </div>
+        </div>
+        <div class="filter orientation js-orientation">
+            <div class="filter__title"> </div>
+          <div class="filter__parametrs">
+            {% if setting('show_list') %}
+            <div class="filter__parametr">
+			  <input class="filter__input js-line" name="view" type="radio" {{ view == 'list'?'checked':'' }} />
+              <a href="{{ request().fullUrlWithQuery({"view" : 'list'}) }}" class="filter__label" title="{{ __("List") }}"><span class="orientation-line"></span></a>
+            </div>
+            {% endif %}
+
+            {% if setting('show_grid') %}
+            <div class="filter__parametr">
+              <input class="filter__input ja-sell" name="view" type="radio" {{ view == 'grid'?'checked':'' }} />
+              <a href="{{ request().fullUrlWithQuery({"view" : 'grid'}) }}" class="filter__label" title="{{ __("Grid") }}"><span class="orientation-cell"></span></a>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <aside class="content__side-bar">
+  {% for facet in facets if facet.search_ui == 'category' %}
+      {% include 'browse.filters.'~facet.search_ui ignore missing %}
+  {% endfor %}
+  </aside>
+
+  <main class="content__main">
+    <div class="catalog js-catalog catalog--{{ view == 'list'?'line':'cell' }}" id="listing_results">
+	  {% if listings.total() > 0 %}
+          {% include 'browse.partials.list' %}
+      {% else %}
+      <div class="catalog__empty">{{ __("Sorry, no results found.") }}</div>
+      {% endif %}
+    </div>
+    <div id="indicator" style="display: none; text-align: center; background: rgba(255,255,255, 0.75); width: 100%; height: 100%; position: absolute; top: 0; left: 0;">
+        <div class="loader">{{ __("Loading...") }}</div>
+    </div>
+  </main>
+</div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+
+
+        var xhr = null;
+        var params = {{ params|json_encode() | raw }};
+
+
+        function loadPage(url) {
+            if (history.pushState) {
+                history.pushState(null, null, url);
+            }
+
+            if (xhr && xhr.readyState < 4) {
+                xhr.abort();
+            }
+            $('#indicator').show();
+            var start_time = new Date();
+
+            xhr = $.ajax({
+                url: url,
+                success: function (data) {
+
+					$("#filters-wrapper").html($(data).find("#filters-wrapper").html());
+                    $("#clear-filters").html($(data).find("#clear-filters").html());
+                    $("#category_filter").html($(data).find("#category_filter").html());
+                    $("#listing_results").html($(data).find("#listing_results").html());
+                    initListings();
+
+                },
+                complete: function (data) {
+                    $('#indicator').hide();
+                    var request_time = new Date().getTime() - start_time;
+                    $('#request_time').html(request_time);
+                }
+            });
+        }
+
+        function initListings() {
+
+            //on click categories submit new URL
+            $(".category-link").click(function (e) {
+                e.preventDefault();
+                var url = '{{ route(setting('marketplace_index')) }}?' + $(".auto_submit_item").awesomeFormSerializer({
+                    category: $(this).data('category'),
+                });
+                loadPage(url);
+            });
+
+            //on change search bar submit new URL
+            $('#top-search').on('submit', function (e) {
+                e.preventDefault();
+                $(".auto_submit_item [name='q']").val($("#top-search [name='q']").val());
+                $(".auto_submit_item [name='location']").val($("#top-search [name='location']").val());
+                $(".auto_submit_item [name='lat']").val($("#top-search [name='lat']").val());
+                $(".auto_submit_item [name='lng']").val($("#top-search [name='lng']").val());
+                loadPage('{{ route(setting('marketplace_index')) }}?' + $(".auto_submit_item").serialize());
+                //console.log($("#top-search").serialize());
+            });
+            /*$("#top-search [name='q']").on('input', $.debounce(250, function (e) {
+                e.preventDefault();
+                $("#top-search").submit();
+            }));*/
+
+            //on change form submit new URL
+            $('.auto_submit_item').on('submit change', function (e) {
+                e.preventDefault();
+                loadPage('{{ route(setting('marketplace_index')) }}?' + $(".auto_submit_item").serialize());
+            });
+
+            //on change sort submit new URL
+            $("#sort").change(function (e) {
+                e.preventDefault();
+                $(".auto_submit_item [name='sort']").val($("#sort").val());
+                loadPage('{{ route(setting('marketplace_index')) }}?' + $(".auto_submit_item").serialize());
+            });
+
+        }
+
+        var view = '{{ view }}';
+        $(function () {
+            initListings();
+        });
+
+    </script>
+
+{% endblock %}

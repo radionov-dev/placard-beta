@@ -1,0 +1,31 @@
+{% extends "account.master" %}
+
+{% block user_area %}
+    <div class="profileNav__item {{ active(['account.edit_profile.index'], 'active') }}"><a href="{{ route('account.edit_profile.index') }}" class="profileNav__link">{{ __('Common') }}</a></div>
+    <div class="profileNav__item {{ active(['account.delivery.index'], 'active') }}"><a href="{{ route('account.delivery.index') }}" class="profileNav__link">{{ __('Delivery') }}</a></div>
+    {#<div class="profileNav__item {{ active(['account.bank-account.index'], 'active') }}"><a href="{{ route('account.bank-account.index') }}" class="profileNav__link">{{ __('Payments') }}</a></div>#}
+    {% if module_enabled('userverification') %}
+        <div class="profileNav__item {{ active(['account.userverification.index'], 'active') }}"><a href="{{ route('account.userverification.index') }}" class="profileNav__link">{{ __('Identity Verification') }}</a></div>
+    {% endif %}
+<main class="content__main">
+    <div class="fieldset">
+        <h3 class="fieldset__title">{{ __("Payment Method") }}</h3>
+    </div>
+<div class="card panel-default" data-turbolinks="false">
+    <div class="card-body">
+
+        {% include 'notifications' %}
+
+        {% for payment_provider in payment_providers %}
+            {%  if payment_provider.is_offline %}
+                {% include [ payment_provider.key ~ '::form', 'account.payment_methods.generic'] with {'payment_provider' : payment_provider}  %}
+            {%  else %}
+                {% include [ payment_provider.key ~ '::form', 'account.payment_methods.generic'] with {'payment_provider' : payment_provider}  %}
+            {% endif %}
+        {% endfor %}
+
+
+    </div>
+</div>
+</main>
+{% endblock %}

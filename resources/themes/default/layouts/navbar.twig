@@ -1,0 +1,89 @@
+<header class="header">
+	<div class="header__bar">
+        {% if auth_guest() %}
+        <nav class="headerUserBar headerUserBar_auth_false">
+			<section class="headerUserBar__cabinetLinks">
+				<a class="headerUserBar__cabinetLink headerUserBar__authLink_login" href="{{ route('login') }}">{{ __("Sign in") }}</a>
+				<a class="headerUserBar__cabinetLink headerUserBar__authLink_signin" href="{{ route('register') }}">{{ __("Register") }}</a>
+			</section>
+            {% if supported_locales()|length > 1 %}
+			<div class="headerCountry">
+				<div class="headerCountry__label">{{ __("Choose your country") }}</div>
+				<div class="headerCountry__select select-wrapper">
+					<select id="guest_country" onchange="location = $(this).val();" class="select">
+						{% for localeCode, properties in supported_locales() %}
+<<<<<<< HEAD
+                        <option value="{{ get_localized_url(localeCode) }}" {% if localeCode == current_locale() %}selected{% endif %}>{{ properties.name | capitalize }}</option>
+=======
+                        <option value="{{ get_low_localized_url(localeCode) }}" {% if localeCode == current_locale() %}selected{% endif %}>{{ properties.name | capitalize }}</option>
+>>>>>>> 12e3f98d (step 1 - low_localized_url)
+                        {% endfor %}
+					</select>
+				</div>
+			</div>
+            {% endif %}
+		</nav>
+        {% else %}
+        <nav class="headerUserBar headerUserBar_auth_true">
+			<section class="headerUserBar__cabinetLinks">
+				<a href="{{ route('account.edit_profile.index') }}" class="headerUserBar__cabinetLink {{ active(['account.edit_profile.index'], 'isActive') }}">{{ __('Profile') }}</a>
+				<a href=" {{ route('inbox.index') }}" class="headerUserBar__cabinetLink {{ active(['inbox*'], 'isActive') }}">{{ __('Messages') }}</a>
+				{% if getUnreadMessagesCount() >= 1 %}<div class="userBlock__indicator" style="display: inline-block; vertical-align: top; margin-left: -26px; margin-right: 3px; min-width: 23px; line-height: 23px; font-size: 10px; text-align: center; border-radius: 50%; background: #f44336; color: #fff;">new</div>{% endif %}
+				<a href="{{ route('account.listings.index') }}" class="headerUserBar__cabinetLink {{ active(['account.listings.*'], 'isActive') }}">{{ __('Inventory') }}</a>
+				<a href="{{ route('account.orders.index') }}" class="headerUserBar__cabinetLink {{ active(['account.orders.*', 'account.purchase-history.*'], 'isActive') }}">{{ __('Deals') }}</a>
+				<a href="#" class="headerUserBar__toogle">.&nbsp;.&nbsp;.</a>
+				<div class="headerUserBar__container">
+                    {% if auth_user().hasAnyRole(['admin', 'moderator']) %}
+					<a href="/panel" class="headerUserBar__cabinetLink ">{{ __("Admin Panel") }}</a>
+                    {% endif %}
+				</div>
+			</section>
+			<section class="headerUserBar__auth">
+				<a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit(); return false;" class="headerUserBar__authLink headerUserBar__authLink_logout">{{ __("Logout") }}</a>
+                <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                  {{ csrf_field() }}
+                </form>
+			</section>
+		</nav>
+        {% endif %}
+	</div>
+	<div class="header__content">
+		<div class="headerLogo">
+          <a href="/{{ current_locale() != default_locale()?current_locale():'' }}">
+            {% if not setting('site_logo') %}
+            {{  setting('site_name') }}
+            {% else %}
+            <img src="{{ setting('logo', '../../logo.png') }}" title="{{ setting('site_title') }}" class="headerLogo__pic"/>
+            {% endif %}
+          </a>
+		</div>
+		<div class="headerDropMenu js-popover popoverBottom">
+			<button class="headerDropMenu__toggle js-popover__toggle" type="button">{{ __("Menu") }}</button>
+			<div class="headerDropMenu__container js-popover__container popover__container">
+				<span class="popover__item"><a class="contentNav__link" href="{{ route('account.favorites.index') }}">{{ __('Favorites') }}</a></span>
+                {% for item in get_categories(0) %}
+				<span class="popover__item"><a class="contentNav__link" href="{{ route('browse', {'category' : item.id}) }}">{{ _l(item.name) }}</a></span>
+				{% for item2 in get_categories( item.id ) %}
+				<span class="popover__item"><a class="contentNav__link" href="{{ route('browse', {'category' : item2.id}) }}"> - {{ _l(item2.name) }}</a></span>
+				{% endfor %}
+                {% endfor %}
+                <span class="popover__item"><a class="contentNav__link" href="{{ route('browse') }}">{{ __("All categories") }}</a></span>
+			</div>
+		</div>
+		<form action="{{ route('browse') }}" method="GET" class="headerSearch" role="search">
+			<input type="search" id="_search" name="q" placeholder="{{ __("Search") }}" class="headerSearch__field input--search" value="{{ request('q') }}" />
+			<div class="select-wrapper headerSearch__section">
+				<select id="_categoryid" name="category" class="select">
+					<option value="0">{{ __("All categories") }}</option>
+                    {% for item in get_categories(0) %}
+						<option value="{{ item.id }}" {{ (request('category') == item.id) ? 'selected' : '' }}>{{ item.name }}</option>
+						{% for item2 in get_categories( item.id ) %}
+						<option value="{{ item2.id }}" {{ (request('category') == item2.id) ? 'selected' : '' }}> - {{ item2.name }}</option>
+                    	{% endfor %}
+                    {% endfor %}
+				</select>
+			</div>
+			<input type="submit" value="{{ __("Search") }}" class="headerSearch__submit" />
+		</form>
+	</div>
+</header>

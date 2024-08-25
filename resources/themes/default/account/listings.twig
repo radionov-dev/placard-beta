@@ -1,0 +1,101 @@
+{% extends "account.master" %}
+
+{% block user_area %}
+<main class="content__main inventory">
+    <div class="fieldset content__header">
+        <h2 class="content__title fieldset__title">{{ __("Inventory") }}</h2>
+        <a class="btn" href="{{ route('create.index') }}">{{ __("Add Listings") }}</a>
+    </div>
+    <div class="inventory__header">
+			<div class="inventory__controls">
+				<div class="inventory__toogle">
+					<div class="option">
+						<input type="checkbox" name="group1" class="js-main-checkbox" id="form1-1">
+						<label for="form1-1"></label>
+					</div>
+				</div>
+				<a href="#" onclick="cabinetinventoryitems.activateItems ({'controls' : cabinetinventoryitems.getControlCheckboxes()});return false;" class="inventory__control inventory__control-1">{{ __("Activate") }}</a>
+				<a href="#" onclick="cabinetinventoryitems.deactivateItems ({'controls' : cabinetinventoryitems.getControlCheckboxes()});return false;" class="inventory__control inventory__control-2">{{ __("Deactivate") }}</a>
+			</div>
+			<div class="inventory__fields">
+				<div class="field">
+					<div class="field__title">Status</div>
+					<div class="field__item">
+						<div class="select-wrapper">
+							<select onchange="location=$(this).val();return false;" class="select">
+								<option value="{{ request().fullUrlWithQuery({"status" : null}) }}">{{ __("All") }}</option>
+								<option value="{{ request().fullUrlWithQuery({"status" : 1}) }}" {{ status == '1'?'selected':'' }}>Enabled</option>
+								<option value="{{ request().fullUrlWithQuery({"status" : 0}) }}" {{ status == '0'?'selected':'' }}>Disabled</option>
+							</select>
+						</div>
+					</div>
+				</div>
+				<div class="field">
+					<div class="field__title">Price</div>
+					<div class="field__item">
+						<div class="select-wrapper">
+							<select onchange="location=$(this).val();return false;" class="select">
+								<option value="{{ request().fullUrlWithQuery({"sort-price" : null}) }}"> - </option>
+								<option value="{{ request().fullUrlWithQuery({"sort-price" : 'ASC'}) }}" {{ sort_price == 'ASC'?'selected':'' }}>Low to high</option>
+								<option value="{{ request().fullUrlWithQuery({"sort-price" : 'DESC'}) }}" {{ sort_price == 'DESC'?'selected':'' }}>Hight to Low</option>
+							</select>
+						</div>
+					</div>
+				</div>
+				<div class="field field--search">
+					<div class="field__item">
+						<input onchange="location='{{ request().fullUrlWithQuery({"q" : ''}) }}'+$(this).val();return false;" type="search" class="input input--search" value="{{ q }}" placeholder="Search...">
+					</div>
+				</div>
+			</div>
+		</div>
+<div class="inventory__content">
+    {% if listings %}
+      {% for i, item in listings %}
+        <div class="inventory__item">
+        <div class="inventory__toogle">
+		<div class="option">
+			<input type="checkbox" class="js-checkbox" id="itemcontrol_44" value="44">
+			<label for="itemcontrol_44"></label>
+		</div>
+	</div>
+            <div class="inventory__card">
+                <div class="dealCard">
+                    <div class="dealCard__pic">
+                        <a href="{{ item.url }}"><img src="{{ item.thumbnail }}?w=300&h=255" alt="{{item.title}}" class="dealCard__img"></a>
+                    </div>
+                    <div class="dealCard__data">
+                        <a href="{{ item.url }}" class="dealCard__title">{{item.title}}</a>{% if item.is_draft %}<small class="badge badge-secondary">draft</small>{% endif %}<br>
+                        {% if item.stock is not null %}
+                            <i class="text-muted">{{item.stock}} in stock</i>
+                        {% endif %}
+                        <div class="dealCard__params">
+                            <div class="dealCard__param group">
+                                <div class="group__minor">Price:</div>
+                                <div class="group__major dealCard__price">{{ item.price_updated }} {{ item.currency }}</div>
+                            </div>
+                            <div class="dealCard__param group">
+                                <div class="group__minor">Deal type:&nbsp;</div>
+                                <div class="group__major">{{item.pricing_model.name}}</div>
+                            </div>
+                            <div class="dealCard__param group">
+                                <div class="group__minor">{{ __('Date Created') }}:</div>
+                                <div class="group__major">{{ item.created_at.toFormattedDateString() }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dealCard__total">
+                        <a href="{{ item.edit_url }}" class="btn btn--smal btn--accent">{{ __('Edit') }}</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+      {% endfor %}
+    {% else %}
+    <div class="msg">{{ __('Listings not found') }}</div>
+    {% endif %}
+</div>
+{{ listings.links() | raw }}
+</main>
+{% endblock %}
+

@@ -1,0 +1,100 @@
+{% extends "inbox.master" %}
+
+{% block inner %}
+    <div class="progress rounded-0 bg-white" id="inbox-spinner"
+         style="position: absolute; width: 100%; margin-top: -10px; display: none">
+        <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar"
+             aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div>
+    </div>
+
+    <div class="chat__users">
+        <div class="chat__toogle"></div>
+    <div class="userList">
+        {% for k, inbox in inboxes %}
+            <div class="userList__item {% if recipient.id == inbox.thread.conversation_id %}active{% endif %}"  ic-indicator="#inbox-spinner"
+                 ic-get-from="{{  route('inbox.show', inbox.thread.conversation_id) }}"
+                 ic-select-from-response="#inbox-main" ic-target="#inbox-main" ic-replace-target="false">
+                <div class="userBlock userBlock--chat">
+                    <a href="{{  route('inbox.show', inbox.thread.conversation_id) }}" class="userBlock__title">
+                        {% if inbox.order %}
+                            <div class="userBlock__pic">
+                                <img src="{{ inbox.order.listing.thumbnail }}" alt="{{ inbox.order.listing.title }}" class="userBlock__img" />
+                                {% if not inbox.thread.is_seen and inbox.thread.user_id != auth_user().id %}
+                                    <div class="userBlock__indicator">new</div>
+                                {% endif %}
+                            </div>
+                            <span class="userBlock__name">{{ __('Deal') }} #{{ inbox.order.id }}</span>
+                        {% else %}
+                        <div class="userBlock__pic">
+                            <img src="{{ inbox.withUser.avatar }}" alt="{{ inbox.withUser.display_name }}" class="userBlock__img" />
+                            {% if not inbox.thread.is_seen and inbox.thread.user_id != auth_user().id %}
+                                <div class="userBlock__indicator">new</div>
+                            {% endif %}
+                        </div>
+                        <span class="userBlock__name">{{ inbox.withUser.display_name }}</span>
+                        {% endif %}
+                    </a>
+                    <div class="userBlock__message">
+                        <div class="userBlock__date">{{inbox.thread.created_at.diffForHumans()}}</div>
+                        <div class="userBlock__text">{{ inbox.thread.message  | filter_message | str_limit(140)}}</div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    </div>
+    <div class="chat__messages">
+        <div class="messagesList">
+            {% if not recipient.id and inboxes | length == 0 %}
+                {{ __("Your inbox is currently empty") }}
+            {% elseif messages %}
+            {% for k, msg in messages %}
+                <div class="messages__item  {% if recipient.id != msg.sender.id %}messages__item--my{% endif %}">
+                    <div class="userBlock userBlock--chat">
+                        <a href="{{msg.sender.url }}" class="userBlock__title">
+                            <div class="userBlock__pic">
+                                <img src="{{msg.sender.avatar }}" alt="{{msg.sender.name }}" class="userBlock__img" />
+                            </div>
+                            <div class="userBlock__name">{{msg.sender.display_name }}</div>
+                        </a>
+                        <div class="userBlock__message">
+                            <div class="userBlock__date">{{msg.created_at.toDayDateTimeString()}}</div>
+                            <div class="userBlock__text">{{msg.message | filter_message}}</div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+            {% elseif recipient.id != auth_user().id %}
+                No Messages
+            {% endif %}
+        </div>
+        {% if recipient.id %}
+            {% if auth_user().id == recipient.id and is_order is null %}
+                <div class="alert alert-danger messagesNew" role="alert">
+                    {{ __("Alert - You cannot send a message to yourself.") }}
+                </div>
+            {% else %}
+
+                <div class="messagesNew">
+                    {% if errors.has('message') %}
+                        <div class="form-control-feedback invalid-feedback">{{ errors.first('message') }}</div>
+                    {% endif %}
+                    {% if errors.has('captcha') %}
+                        <div class="form-control-feedback invalid-feedback">{{ errors.first('captcha') }}</div>
+                    {% endif %}
+                    {{ form_open({'url' : route("inbox.index"), 'class':  "form" }) }}
+                    {{ form_hidden('display_name', recipient.display_name) }}
+                    {{ form_hidden('recipient_id', recipient.id) }}
+                    {{ form_textarea('message', message, {'class': 'textarea messagesNew__text', 'required':'required', 'id':'body', 'placeholder': 'Write your message...'}) }}
+                    <div class="messagesNew__total" style="line-height: 28px;">
+                        {{ captcha|raw }}
+                            <input type="text" id="captcha" name="captcha" class="input" autocomplete="off" style="display: inline-block; vertical-align: top; width: auto;" placeholder="{{ __("Captcha") }}" required>
+
+                        <input class="btn" type="submit" value="{{ __("Send message") }}" style="vertical-align: top;margin-left: 15px;" >
+                    </div>
+                    </form>
+                </div>
+            {% endif %}
+        {% endif %}
+    </div>
+{% endblock %}

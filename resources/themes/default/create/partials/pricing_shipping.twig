@@ -1,0 +1,323 @@
+{% if default_shipping or listing.pricing_model.can_add_shipping %}
+
+    {% if default_shipping %}
+    <div class="card mb-4 fieldset">
+        <h2 class="fieldset__title">{{ __("Shipping Methods") }}</h2>
+        <div class="card-body" id="default_shippings">
+            {% for default_shipping_option in default_shipping.values %}
+              <h3 style="margin-bottom: 0"><label><input type="checkbox" name="{{ default_shipping.name }}[]" value="{{ default_shipping_option.value }}" {% if default_shipping_option.value in default_shipping.value %}checked="checked"{% endif %}> {{ default_shipping_option.label }}</label></h3>
+
+            <div class="repeater-default" id="default_shipping{{ default_shipping_option.value }}" style="{{ (default_shipping_option.value in default_shipping.value) ? '' : 'display:none;' }}">
+              <div data-repeater-list="default_shipping[{{ default_shipping_option.value }}]" class="inventory">
+                  {% if default_shipping_option.value == 1 %}
+                        <div data-repeater-item class="fieldset__row" style="display: none;">
+                                <div class="field">
+                                    <div class="field__item">
+                                    <div class="field__title">
+                                        {{ __("Name") }}:
+                                    </div>
+                                        <input type="text" name="name" placeholder="e.g. First Class" value="{{ default_shipping_option.label }}" class="input form-control"  />
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <div class="field__item">
+                                    <div class="field__title">
+                                        {{ __("Price") }}:
+                                    </div>
+                                        <input type="number" name="price" placeholder=""  value="0" min="0" step="0.01" class="input form-control"/>
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <div class="field__item">
+                                    <div class="field__title">
+                                        {{ __("Max Delivery Days") }}:
+                                    </div>
+                                        <input type="number" name="delivery_days" placeholder=""  value="{% if default_shipping_option.value == 4 %}14{% elseif default_shipping_option.value == 3 %}30{% else %}0{% endif %}" min="0" step="1" class="input form-control"/>
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <div class="field__item">
+                                    <div class="field__title">
+                                        {{ __("Max Items per Parcel") }}:
+                                    </div>
+                                        <input type="number" name="parcel_items" placeholder="" value="1" min="0" step="1" class="input form-control"/>
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <div class="field__item">
+                                    </div>
+                                </div>
+                        </div>
+                  {% else %}
+                      {% set _row_ = 0 %}
+                      {% for shipping_option in listing.shipping_options %}
+                        {% if shipping_option.is_default == default_shipping_option.value %}
+                        <div data-repeater-item class="fieldset__row">
+                          {% if default_shipping_option.value == 2 %}
+                            <div class="field" style="display: none">
+                                <div class="field__item">
+                                    <div class="field__title">
+                          {{ __("Country") }}:
+                                    </div>
+                                        <input type="text" name="country" placeholder="" value="{{ listing.country }}" class="input form-control" />
+                                    </div>
+                            </div>
+                            <div class="field" style="display: none">
+                                <div class="field__item">
+                                    <div class="field__title">
+                          {{ __("City") }}:
+                                    </div>
+                                        <input type="text" name="city" placeholder="" value="{{ listing.city }}" class="input form-control" />
+                                    </div>
+                            </div>
+                              {% endif %}
+                                <div class="field">
+                                    <div class="field__item">
+                                    <div class="field__title">
+                          {{ (default_shipping_option.value == 2) ? __("Location")  : __("Name") }}:
+                                    </div>
+                                        <input type="text" name="name" placeholder="" value="{{ shipping_option.name }}" class="input form-control" />
+                                    </div>
+                                </div>
+                                <div class="field" style="{{ (default_shipping_option.value == 2) ? "display:none;"  : ""  }}">
+                                    <div class="field__item">
+                                    <div class="field__title">
+                                        {{ __("Price") }}:
+                                    </div>
+                                        <input type="number" name="price" placeholder="" value="{{ shipping_option.price }}" min="0" step="0.01" class="input form-control"/>
+                                    </div>
+                                </div>
+                                <div class="field" style="{{ (default_shipping_option.value == 2) ? "display:none;"  : ""  }}">
+                                    <div class="field__item">
+                                    <div class="field__title">
+                                        {{ __("Max Delivery Days") }}:
+                                    </div>
+                                        <input type="number" name="delivery_days" placeholder="" value="{{ shipping_option.delivery_days }}" min="0" step="1" class="input form-control"/>
+                                    </div>
+                                </div>
+                                <div class="field" style="{{ (default_shipping_option.value == 2) ? "display:none;"  : ""  }}">
+                                    <div class="field__item">
+                                    <div class="field__title">
+                                        {{ __("Max Items per Parcel") }}:
+                                    </div>
+                                        <input type="number" name="parcel_items" placeholder="" value="{{ shipping_option.parcel_items }}" min="0" step="1" class="input form-control"/>
+                                    </div>
+                                </div>
+                                <div class="field">
+                          {% if default_shipping_option.value != 2 %}
+                                    <div class="field__item">
+                                        <button type="button" data-repeater-delete class="btn btn--minor btn--smal">
+                                            <span class="mdi mdi-minus"></span> {{ __("Delete") }}
+                                        </button>
+                                    </div>
+                              {% endif %}
+                                </div>
+                        </div>
+                            {% set _row_ = _row_+1 %}
+                          {% endif %}
+                      {% endfor %}
+                      {% if not _row_ %}
+                          <div data-repeater-item class="fieldset__row">
+                              {% if default_shipping_option.value == 2 %}
+                                  <div class="field" style="display: none">
+                                <div class="field__item">
+                                    <div class="field__title">
+                          {{ __("Country") }}:
+                                    </div>
+                                        <input type="text" name="country" placeholder="" value="{{ listing.country }}" class="input form-control" />
+                                    </div>
+                            </div>
+                                  <div class="field" style="display: none">
+                                <div class="field__item">
+                                    <div class="field__title">
+                          {{ __("City") }}:
+                                    </div>
+                                        <input type="text" name="city" placeholder="" value="{{ listing.city }}" class="input form-control" />
+                                    </div>
+                            </div>
+                              {% endif %}
+                                <div class="field">
+                                    <div class="field__item">
+                                    <div class="field__title">
+                                        {{ (default_shipping_option.value == 2) ? __("Location")  : __("Name") }}:
+                                    </div>
+                                        <input type="text" name="name" placeholder="e.g. First Class" value="" class="input form-control" />
+                                    </div>
+                                </div>
+                                <div class="field" style="{{ (default_shipping_option.value == 2) ? "display:none;"  : "" }}">
+                                    <div class="field__item">
+                                    <div class="field__title">
+                                        {{ __("Price") }}:
+                                    </div>
+                                        <input type="number" name="price" placeholder="" value="0" min="0" step="0.01" class="input form-control"/>
+                                    </div>
+                                </div>
+                                <div class="field" style="{{ (default_shipping_option.value == 2) ? "display:none;"  : ""  }}">
+                                    <div class="field__item">
+                                    <div class="field__title">
+                                        {{ __("Max Delivery Days") }}:
+                                    </div>
+                                        <input type="number" name="delivery_days" placeholder="" value="{% if default_shipping_option.value == 3 %}14{% elseif default_shipping_option.value == 4 %}30{% else %}0{% endif %}" min="0" step="1" class="input form-control"/>
+                                    </div>
+                                </div>
+                                <div class="field" style="{{ (default_shipping_option.value == 2) ? "display:none;"  : ""  }}">
+                                    <div class="field__item">
+                                    <div class="field__title">
+                                        {{ __("Max Items per Parcel") }}:
+                                    </div>
+                                        <input type="number" name="parcel_items" placeholder="" value="{{ (default_shipping_option.value == 2) ? '0'  : '1' }}" min="0" step="1" class="input form-control"/>
+                                    </div>
+                                </div>
+                                <div class="field">
+                      {% if default_shipping_option.value != 2 %}
+                                    <div class="field__item">
+                                            <button type="button" data-repeater-delete class="btn btn--minor btn--smal">
+                                        <span class="mdi mdi-minus"></span> {{ __("Delete") }}
+                                    </button>
+                                    </div>
+                          {% endif %}
+                                </div>
+                        </div>
+                      {% endif %}
+                  {% endif %}
+              </div>
+                {% if not (default_shipping_option.value in ["1", "2"]) %}
+                  <button type="button" data-repeater-create class="btn btn--outline btn--smal">
+                    <span class="mdi mdi-plus"></span> {{ __("Add") }}
+                  </button>
+                {% endif %}
+                <div class="form__total">
+              </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+        <script type="text/javascript">
+            $(document).on('change', 'input[name="filters[shipping][]"][type="checkbox"]', function () {
+                if($(this).val() == "1") {
+                    if($(this).prop('checked')) {
+                        $('#default_shippings h3 input[type=\'checkbox\'][value!=\'1\']').prop('checked', false).change().prop('disabled', true);
+                        $('.repeater-default[id^="default_shipping"]').hide();
+                    } else {
+                        $('#default_shippings h3 input[type=\'checkbox\'][value!=\'1\']').prop('disabled', false)
+                    }
+                } else {
+                    $('#default_shipping' + $(this).val()).toggle();
+                }
+            });
+        </script>
+    {% endif %}
+
+    {% if listing.pricing_model.can_add_shipping %}
+    <div class="card mb-4 fieldset">
+        <h2 class="fieldset__title">{{ __("Shipping fees") }}</h2>
+        <div class="card-body">
+            <div class="repeater-default">
+                <div data-repeater-list="shipping" class="inventory">
+                    {% set _row_ = 0 %}
+                    {% if listing.shipping_options | length > 0 %}
+                        {% for shipping_option in listing.shipping_options %}
+                        {% if shipping_option.is_default == 0 %}
+                        <div data-repeater-item class="fieldset__row">
+                                <div class="field">
+                                    <div class="field__item">
+                                    <div class="field__title">
+                                        {{ __("Name") }}:
+                                    </div>
+                                        <input type="text" name="name" placeholder="e.g. First Class" value="{{ shipping_option.name }}" class="input form-control" />
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <div class="field__item">
+                                    <div class="field__title">
+                                        {{ __("Price") }}:
+                                    </div>
+                                        <input type="number" name="price" placeholder="" value="{{ shipping_option.price }}" min="0" step="0.01" class="input form-control"/>
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <div class="field__item">
+                                    <div class="field__title">
+                                        {{ __("Max Delivery Days") }}:
+                                    </div>
+                                        <input type="number" name="delivery_days" placeholder="" value="{{ shipping_option.delivery_days }}" min="0" step="1" class="input form-control"/>
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <div class="field__item">
+                                    <div class="field__title">
+                                        {{ __("Max Items per Parcel") }}:
+                                    </div>
+                                        <input type="number" name="parcel_items" placeholder="" value="{{ shipping_option.parcel_items }}" min="0" step="1" class="input form-control"/>
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <div class="field__item">
+                                        <button type="button" data-repeater-delete class="btn btn--minor btn--smal">
+                                            <span class="mdi mdi-minus"></span> {{ __("Delete") }}
+                                        </button>
+                                    </div>
+                                </div>
+                        </div>
+                            {% set _row_ = _row_+1 %}
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
+                    {% if not _row_ %}
+                        <div data-repeater-item class="fieldset__row">
+                                <div class="field">
+                                    <div class="field__item">
+                                    <div class="field__title">
+                                        {{ __("Name") }}:
+                                    </div>
+                                        <input type="text" name="name" placeholder="e.g. First Class" value="" class="input form-control" />
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <div class="field__item">
+                                    <div class="field__title">
+                                        {{ __("Price") }}:
+                                    </div>
+                                        <input type="number" name="price" placeholder="" value="0" min="0" step="0.01" class="input form-control"/>
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <div class="field__item">
+                                    <div class="field__title">
+                                        {{ __("Max Delivery Days") }}:
+                                    </div>
+                                        <input type="number" name="delivery_days" placeholder="" value="0" min="0" step="1" class="input form-control"/>
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <div class="field__item">
+                                    <div class="field__title">
+                                        {{ __("Max Items per Parcel") }}:
+                                    </div>
+                                        <input type="number" name="parcel_items" placeholder="" value="1" min="0" step="1" class="input form-control"/>
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <div class="field__item">
+                                      <button type="button" data-repeater-delete class="btn btn--minor btn--smal">
+                                        <span class="mdi mdi-minus"></span> {{ __("Delete") }}
+                                      </button>
+                                    </div>
+                                </div>
+                        </div>
+                    {% endif %}
+                </div>
+	  <button type="button" data-repeater-create class="btn btn--outline btn--smal">
+		<span class="mdi mdi-plus"></span> {{ __("Add") }}
+	  </button>
+                <div class="form__total">
+                </div>
+
+            </div>
+        </div>
+
+
+    </div>
+        {% endif %}
+{% endif %}

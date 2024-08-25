@@ -1,0 +1,171 @@
+{% extends "layouts.app" %}
+
+{% block search_bar %}{% endblock %}
+
+{% block content %}
+    <div class="content" id="registerform">
+	<div class="content__header">
+		<h1 class="content__title">{{ __("Registration") }}</h1>
+		{% include 'notifications' %}
+	</div>
+	<main class="content__main">
+		<form method="POST" action="{{ route('register') }}" class="form">
+            {{ csrf_field() }}
+
+            {% if(setting('facebook_key')) %}
+            <a href="/login/facebook" data-turbolinks="false" class="btn btn-md btn-facebook btn-block mt-3"><i class="fa fa-facebook fa-fw"></i> {{ __("Register with Facebook") }}</a>
+
+            <div class="col-12 text-center text-muted mb-4 mt-4">
+                — {{ __("or") }} —
+            </div>
+            {% endif %}
+			<div class="fieldset">
+				<div class="fieldset__content">
+					<div class="fieldset__row">
+						<div class="field">
+							<label for="name" class="field__title">{{ __("Name") }}</label>
+							<div class="field__item">
+								<input class="input{{ errors.has('name') ? ' is-invalid' : '' }}" type="text" id="name" name="name" value="{{ old('name') }}" placeholder="e.g. Jack Sparrow" required autofocus>
+                                {% if errors.has('name') %}
+                                <small class="form-control-feedback invalid-feedback">{{ errors.first('name') }}</small>
+                                {% endif %}
+							</div>
+						</div>
+					</div>
+					<div class="fieldset__row">
+						<div class="field">
+							<label for="email" class="field__title">{{ __("Email/BitMessage address") }}</label>
+							<div class="field__item">
+								<input class="input{{ (errors.has('email') or errors.has('bitcoin')) ? ' is-invalid' : '' }}" type="text" id="email" name="email" value="{{ old('email') }}" required>
+                                {% if errors.has('email') %}
+                                <small class="form-control-feedback invalid-feedback">{{ errors.first('email') }}</small>
+                                {% endif %}
+								{% if errors.has('bitmessage') %}
+									<small class="form-control-feedback invalid-feedback">{{ errors.first('bitmessage') }}</small>
+								{% endif %}
+							</div>
+						</div>
+					</div>
+					<div class="fieldset__row">
+						<div class="field">
+							<label for="password" class="field__title">{{ __("Password") }}</label>
+							<div class="field__item">
+								<input class="input{{ errors.has('password') ? ' is-invalid' : '' }}" placeholder="{{ __("Something secure") }}" type="password" id="password" name="password" required aria-describedby="passwordHelp">
+                                {% if errors.has('password') %}
+                                <div class="form-control-feedback invalid-feedback">{{ errors.first('password') }}</div>
+                                {% endif %}
+								<input class="input" id="password-confirm" type="password" name="password_confirmation" placeholder="{{ __("Confirm your password") }}" required>
+							</div>
+						</div>
+					</div>
+					<div class="fieldset__row">
+						<div class="field">
+							<label for="bitcoin" class="field__title">{{ __("Bitcoin Address") }}</label>
+							<div class="field__item">
+								<input class="input{{ errors.has('bitcoin') ? ' is-invalid' : '' }}" placeholder="{{ __("Bitcoin Address") }}" onchange="bs_status();" type="text" id="bitcoin" name="bitcoin" value="{{ old('bitcoin') }}" required>
+                                {% if errors.has('bitcoin') %}
+                                <div class="form-control-feedback invalid-feedback">{{ errors.first('bitcoin') }}</div>
+                                {% endif %}
+							</div>
+						</div>
+					</div>
+                  {#
+					<div class="fieldset__row">
+						<div class="field">
+							<label for="bitcoin_public_key" class="field__title">{{ __('Bitcoin Public Key') }}</label>
+							<div class="field__item">
+								{{ form_textarea('bitcoin_public_key', null, {'class' : 'input','id' : 'bitcoin_public_key'}) }}
+							</div>
+						</div>
+					</div>
+                  #}
+
+					<div class="fieldset__row">
+						<div class="field">
+							<label for="currency" class="field__title">{{ __("Currency") }}</label>
+							<div class="field__item">
+								<div class="select-wrapper">
+									<select id="currency" class="select" name="currency">
+										{% for curr in currencies %}
+											<option value="{{ curr }}" {% if ( old('currency') and old('currency') == curr ) or ( not old('currency') and curr == currency) %}selected{% endif %}>{{ curr }}</option>
+										{% endfor %}
+									</select>
+								</div>
+							</div>
+						</div>
+					</div>
+
+                    {% if selectable_roles %}
+					<div class="fieldset__row">
+						<div class="field">
+							<label for="role" class="field__title">{{ __("Member type") }}</label>
+							<div class="field__item">
+                                <select class="select" id="role" name="role">
+									{% for selectable_role in selectable_roles %}
+                                        <option value="{{selectable_role.id}}">{{ _l(selectable_role.name) }}</option>
+                                    {% endfor %}
+								</select>
+							</div>
+						</div>
+					</div>
+                    {% endif %}
+					<div class="fieldset__row">
+						<div class="field">
+							<label for="countryid" class="field__title">{{ __("Country") }}</label>
+							<div class="field__item">
+								<div class="select-wrapper">
+									<select id="countryid" class="select" name="country">
+										{% for localeCode, properties in supported_locales() %}
+                                            <option value="{{ localeCode }}" {% if localeCode == current_locale() %}selected{% endif %}>{{ properties.name | capitalize }}</option>
+                                        {% endfor %}
+									</select>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="fieldset__row" id="captcha_row">
+						<div class="field">
+							<label for="captcha" class="field__title">{{ __("Captcha") }}</label>
+							<div class="field__item">
+								<input type="text" id="captcha" name="captcha" class="input" autocomplete="off" style="display: inline-block; vertical-align: top; width: auto;" required>
+								{{ captcha|raw }}<br>
+								{% if errors.has('captcha') %}
+									<small class="form-control-feedback invalid-feedback">{{ errors.first('captcha') }}</small>
+								{% endif %}
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="form__total">
+				<input class="btn btn--big btn--accent" type="submit" value="{{ __("Sign Up") }}">
+			</div>
+		</form>
+	</main>
+</div>
+	<script>
+		function bs_status() {
+			var data = Object();
+			data['bitcoin'] = $('#bitcoin').val();
+
+			$.ajax({
+				url: '{{ route('bitdeals.status') }}',
+				data:data,
+				success: function (data) {
+					$('#user_sign').remove();
+
+					if(data['user_status']) {
+						var html = '<div class="fieldset__row" id="user_sign"> <div class="field"> <label for="sign" class="field__title">{{ __("BitDeals Signature") }}</label> <div class="field__item"> <textarea class="textarea" placeholder="{{ __("Sign this text using your bitcoin key") }}" onchange="$(\'#sign_f\').text($(this).val())"  id="sign" name="sign" required></textarea> </div>  <div id="info-sing-text" class="field__tooltip" style="padding-top: 0;    word-wrap: break-word;">'+data['sign_html']+'\n<div id="sign_f"></div></div> <a class="field__title" id="copy-btn" style="position: absolute; margin: 0; padding: 0; right: 0; width: auto;" href="javascript://" onclick="copy_data(\'info-sing-text\');">{{ __("Copy") }}</a></div></div>';
+
+						$('#captcha_row').before(html);
+					}
+				}
+			});
+		}
+
+
+		{% if(old('sign')) %}
+		bs_status();
+		{% endif %}
+	</script>
+{% endblock %}

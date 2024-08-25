@@ -1,0 +1,61 @@
+<div class="cardFull__user">
+    <a href="{{ listing.user.url }}" class="userBlock">
+        <div class="userBlock__pic">
+            <img src="{{ listing.user.avatar }}" alt="{{ listing.user.display_name }}" class="userBlock__img" />
+        </div>
+        <div class="userBlock__content">
+            <div class="userBlock__name">{{ listing.user.display_name }}</div>
+            {{ include('components.star_rating', {rating: listing.user.averageRate(), total: listing.user.totalCommentCount(), date: listing.user.created_at.format('Y.m') }) }}
+        </div>
+    </a>
+    <div class="cardFull__action">
+        <div class="cardFull__actionItem">
+            {{ listing.user.country }} {{ listing.user.city }}
+        {%  if listing.is_return %}
+            <br>Return for any reason
+        {% endif %}
+	    </div>
+        <div class="cardFull__actionItem">
+            <a href="{{ listing.user.url }}" class="link">Visit store</a>
+        </div>
+        {% if listing.pricing_model.widget != 'request' and listing.pricing_model.widget != 'announcement' %}
+            <div class="cardFull__actionItem">
+                {% if auth_check() %}
+                    <button class="btn btn-default mt-3 btn-block InboxDirectMessage" data-url="{{ route('inbox.create', {'user_id': listing.user_id, 'direct':true}) }}"></button>
+                {% else %}
+                    <a href="{{ route('login') }}" class="btn btn-secondary mt-3 btn-block pop" data-width="300">{{ __("Send message") }}
+                    </a>
+                    <div class="webui-popover-content">
+                        <p class="h6">{{ __('Want to contact the seller?') }}</p>
+                        <p>{{ __('Sign in to send a message.') }}</p>
+                        
+                        <a href="{{ route('login') }}" class="btn btn-link text-danger font-weight-bold text-uppercase pl-0">{{ __("Sign in") }}</a>
+                    </div>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+</div>
+<div class="cardData__total">
+    {% if error %}
+        <p class="mb-1 mt-1 p-3 text-muted text-center">{{ error }}</p>
+    {% endif %}
+
+    {%  if total %}
+        <p class=" h6 text-muted">{{ listing.price_per_unit_display }}</p>
+    <div class="cardData__price">{{ format_to_money(total, listing.currency, current_currency()) }}</div>
+    {% endif %}
+
+    {% if auth_check() %}
+        <a class="cardData__btn InboxDirectMessage" data-url="{{ route('inbox.create', {'user_id': listing.user_id, 'direct':true}) }}">{{ __("Send message") }}
+        </a>
+    {% else %}
+        <a href="{{ route('login') }}" class="btn btn-primary btn-block pop"><i class="mdi mdi-share mr-1" ></i> {{ __("Contact seller") }}</a >
+        <div class="webui-popover-content">
+            <p class="h6">{{ __('Want to contact the seller?') }}</p>
+            <p>{{ __('Sign in to send a message.') }}</p>
+           
+            <a href="{{ route('login') }}" class="btn btn-link text-danger font-weight-bold text-uppercase pl-0">{{ __("Sign in") }}</a>
+        </div>
+    {% endif %}
+</div>

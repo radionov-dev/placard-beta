@@ -1,0 +1,141 @@
+.contentNav{}
+.contentNav__link{
+	display: inline-block;
+	vertical-align: middle;
+	color: $color-accent;
+	line-height: 1;
+	&:hover{
+		text-decoration: underline;
+	}
+}
+.contentNav__title{
+	line-height: 1;
+	margin: 20px 0;
+	&:before{
+		content: "";
+		display: inline-block;
+		vertical-align: middle;
+		width: 10px;
+		height: 10px;
+		background-image: url(/staticcontent/img/icon/arrow-smal-right.png);
+		background-repeat: no-repeat;
+		background-position: 50% 50%;
+		background-size: contain;
+		margin-right: 15px;
+	}
+	&:first-child{
+		margin-top: 0;
+	}
+	.contentNav__link{
+		display: inline-block;
+		vertical-align: middle;
+		font-size: 15px;
+		cursor: pointer;
+	}
+}
+.contentNav__title--favorites{
+	&:before{
+		display: inline-block;
+		vertical-align: middle;
+		content: "\2605";
+		color: $color-accent;
+		font-size: 18px;
+		line-height: 0.5;
+		background-image: none;
+	}
+}
+.contentNav__items{
+	padding-left: 47px;
+	display: none;
+}
+.contentNav__item{
+	margin: 20px 0;
+	line-height: 1;
+	&:first-child{
+		margin-top: 0;
+	}
+	&:last-child{
+		margin-bottom: 30px;
+	}
+	.contentNav__link{
+		font-size: 14px;
+	}
+}
+.active{
+	&.contentNav__title{
+		margin-bottom: 20px;
+		&:before{
+			background-image: url(/staticcontent/img/icon/arrow-smal-down.png);
+		}
+	}
+	.contentNav__link{
+		color: $color-text;
+		cursor: default;
+		&:hover{
+			text-decoration: none;
+			color: $color-text;
+		}
+	}
+	&.contentNav__title--favorites{
+		&:before{
+			color: $color-text;
+			background-image: none;
+		}
+	}
+	&:hover{
+		color: $color-text;
+		cursor: default;
+	}
+}
+.active + .contentNav__items{
+	display: block;
+}
+
+
+
+
+.profileNav{
+	margin-top: 20px;
+	font-size: 0;
+}
+.profileNav__item{
+	display: inline-block;
+	vertical-align: bottom;
+}
+.profileNav__link{
+	display: inline-block;
+	vertical-align: middle;
+	position: relative;
+	font-size: 18px;
+	font-weight: 600;
+	padding: 20px 15px;
+	cursor: pointer;
+	&:before{
+		content: "";
+		position: absolute;
+		bottom: 20px;
+		height: 3px;
+		left: 0;
+		right: 0;
+		transition: all .1s ease;
+	}
+	&:hover{
+		text-decoration: none;
+		&:before{
+			bottom: 0;
+			background: $color-accent-dark;
+		}
+	}
+
+}
+
+.active{
+	.profileNav__link{
+		color: $color-text;
+		cursor: default;
+		&:before{
+			bottom: 0;
+			background: $color-text;
+		}
+	}
+}

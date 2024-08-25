@@ -1,0 +1,12 @@
+.box{}
+.box__title{
+	font-size: 18px;
+	font-weight: 600;
+	margin-top: 0;
+	margin-bottom: 12px;
+}
+.box__content{}
+
+.cardFull + .box + .box{
+	margin-top: 30px;
+}

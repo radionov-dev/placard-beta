@@ -1,0 +1,108 @@
+.inventory{
+	.content__title{
+		display: inline-block;
+		vertical-align: bottom;
+		margin-bottom: 5px;
+		width: calc(100% - 110px);
+	}
+	.field{
+		display: inline-block;
+		vertical-align: middle;
+		margin-left: 15px;
+		margin-top: 15px;
+		@include media(phone-smartphone) {
+			width: 100%;
+			margin-left: 0;
+			text-align: left;
+		}
+	}
+	.field__item,
+	.field__title{
+		width: auto;
+		display: inline-block;
+		vertical-align: middle;
+		padding-top: 0;
+	}
+	.field__title{
+		@include media(phone-smartphone) {
+			margin-bottom: 10px;
+		}
+	}
+	.field__item{
+		width: 170px;
+		@include media(phone-smartphone) {
+			width: 100%;
+		}
+	}
+	.option{
+		padding-bottom: 0;
+	}
+	.option,
+	label{
+		width: 100%;
+		height: 100%;
+		padding-left: 0;
+	}
+}
+.inventory__header{
+	@include clearfix;
+	border-top: 1px solid #ececed;
+	padding: 0 0 15px;
+}
+.inventory__add{
+	display: inline-block;
+	vertical-align: bottom;
+}
+.inventory__toogle,
+.inventory__control,
+.inventory__card{
+	display: inline-block;
+	vertical-align: middle;
+}
+.inventory__controls{
+	display: inline-block;
+	vertical-align: top;
+	margin-top: 28px;
+	width: 255px;
+}
+.inventory__toogle{
+	width: 60px;
+	height: 23px;
+}
+.inventory__control{
+	margin-right: 15px;
+	color: $color-minor;
+	&:last-child{
+		margin-right: 0;
+	}
+}
+.inventory__control-2:hover{
+	color: $color-text;
+}
+.inventory__control-3:hover{
+	color: #d32f2f;
+}
+.inventory__fields{
+	display: inline-block;
+	vertical-align: top;
+	text-align: right;
+	width: calc(100% - 260px);
+	@include media(custom, 0px, 830px) {
+		width: 100%;
+	}
+}
+.inventory__content{}
+.inventory__item{
+	font-size: 0;
+	.inventory__toogle{
+		vertical-align: top;
+		height: 150px;
+	}
+	.option input{
+		top: 0;
+		left: 0;
+	}
+}
+.inventory__card{
+	width: calc(100% - 60px);
+}

@@ -1,0 +1,149 @@
+{% extends "layouts.app" %}
+
+{% block search_bar %}
+{% endblock %}
+
+{% block content %}
+<div class="bg-light window-height" >
+<div class="container-fluid" id="create-content-outer" >
+    <div class="mx-auto " id="create-content">
+
+        <div class="row pt-5">
+            <div class="col-12 " style="">
+
+
+
+    <div class="modal-content fieldset" data-turbolinks="false">
+        <div class="modal-header">
+            <h5 class="fieldset__title">{{ __('Post a listing') }}</h5>
+
+            <button type="button" id="postModal-close" class="close" data-dismiss="modal" aria-label="Close" style="color: #ffa726;background: transparent;margin-left: 5px;line-height: 18px;width: 24px;height: 24px;border: 1px solid #ffa726;">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+
+        <form method="POST" accept-charset="UTF-8" class="form create-form fieldset__content"
+            {% if request('category') and request('pricing_model') %}
+              action="{{ route('create.store') }}"
+            {% else %}
+              action="#" ic-get-from="{{ route('create.index') }}" ic-trigger-on="submit" ic-target="#create-content" ic-select-from-response="#create-content" ic-replace-target="false" ic-indicator="#create-spinner"
+            {% endif %}
+        >
+            {{  csrf_field() }}
+        <div class="modal-body">
+            {% if request('category') %}
+                    <div class="page-header ">
+                        <div class="row mb-4">
+                            <div class="col-sm-12">
+                                {% if request('category') %}
+                                    <div class="badge badge-pill badge-secondary mt-1 mr-2">{{ __('Category') }}: {{selected_category.name}} <a href="#"  ic-get-from="{{url_current()}}" class="small" ic-target="#create-content" ic-select-from-response="#create-content"><i class="mdi mdi-close small text-white"></i></a></div>
+                                    {{ form_hidden('category', request('category')) }}
+                                {% endif %}
+
+                                {% if request('pricing_model') %}
+                                    <div class="badge badge-pill badge-secondary mt-1 ">{{ __('Deal type') }}: {{selected_pricing_model}} <a href="#"  ic-get-from="{{request().fullUrlWithQuery({'pricing_model' : null}) }}" class="small" ic-target="#create-content" ic-select-from-response="#create-content"><i class="mdi mdi-close small text-white"></i></a></div>
+                                    {{ form_hidden('pricing_model', request('pricing_model')) }}
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+            {% endif %}
+
+            {% if not request('category') %}
+                <div class="fieldset__row">
+                    <div class="form-group field">
+                        <label class="field__title">{{ __("Select a category") }}</label>
+                         <div class="field__item">{{ form_select('category', categories, request('category'), {'class' : 'select form-controls '}) }}</div>
+                    </div>
+                </div>
+            {% endif %}
+            {% if not request('pricing_model') and request('category') %}
+                    <div class="form-group">
+                        <label for="exampleInputEmail1">{{ __("Deal type") }}</label>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                {% for pricing_model_id, pricing_model_label  in pricing_models %}
+                                    <a href="{{url_full()}}&pricing_model={{pricing_model_id}}"
+                                       data-turbolinks="false" class="btn btn-outline-primary mb-2 mr-2"
+                                       ic-get-from="{{url_full()}}&pricing_model={{pricing_model_id}}"
+                                       ic-target="#create-content"
+                                       ic-select-from-response="#create-content">{{_l(pricing_model_label)}}</a>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+            {% endif %}
+                    <div id="create-spinner" class="text-center" style="display: none">
+                        <div class="fa fa-spinner fa-spin fa-2x text-muted"></div>
+
+                    </div>
+
+            {% include 'notifications' %}
+
+                {% if request('pricing_model') %}
+                    <div class="fieldset__row">
+                        <div class="form-group field has-feedback">
+                            <label class="field__title" for="exampleInputEmail1">{{ __("Title") }}</label>
+                            <div class="field__item">{{ form_text('title', null, {'class' : 'input', 'required':'required', 'data-minlength' : 5}) }}
+                            <div class="help-block with-errors"></div> </div>
+                        </div>
+                    </div>
+                    <div class="fieldset__row">
+                    <div class="field form-group">
+                        <label class="field__title">{{ __("Description") }}</label>
+                        <div class="field__item">{{ form_textarea('description_new', null, {'class' : 'textarea', 'rows' : 4, 'id' : 'description'}) }}
+                        <div id="description_new">
+                            {{ old("description_new") | raw}}
+                        </div>
+                        {{ form_hidden('description', null, {'class' : 'form-control'}) }}
+                        <small id="emailHelp" class="form-text text-muted">{{ __("You can upload images and set your own pricing in the next step.") }}</small>
+                        </div>
+                    </div>
+                    </div>
+                {% endif %}
+        </div>
+        <div class="modal-footer form__total">
+            {% if request('category') and request('pricing_model') %}
+                <button type="submit" class="btn btn--big btn--accent">{{ __("Create & continue") }}</button>
+            {% else %}
+                <button type="submit" class="btn btn--big btn--accent">{{ __("Continue") }}</button>
+            {% endif %}
+        </div>
+        {{ form_close() }}
+
+    </div>
+
+    </div>
+</div>
+</div>
+</div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        $('.autocomplete').selectize({
+            create: false,
+            onChange: function (val) {
+                Intercooler.triggerRequest('.create-form');
+            }
+        });
+
+        if($('#postModal').is(':visible')) {
+            $('#postModal-close').show();
+        } else {
+            $('#postModal-close').hide();
+        }
+
+        if ($('input[name=description_new]').length) {
+            var quill = new Quill('#description_new', {
+                placeholder: '',
+                theme: 'snow'  // or 'bubble'
+            });
+            quill.on('editor-change', function (eventName, args) {
+                $('input[name=description_new]').val(quill.root.innerHTML);
+            });
+
+        }
+    </script>
+{% endblock %}

@@ -1,0 +1,86 @@
+{% extends "account.master" %}
+
+{% block user_area %}
+    <main class="content__main">
+    {% include 'notifications' %}
+      <h1 class="content__title">{{ __('Feedback for Order') }} {{ order.hash }}</h1>
+        {{ form_model(user, {'url' :  route('account.orders.feedback', order), 'files': true, 'id':'feedback', 'class' : 'form'}) }}
+    <div class="fieldset">
+      <div class="fieldset__content">
+	    <div class="fieldset__row">
+          <div class="field">
+            <label class="field__title" for="rate">{{ __('Rate') }}</label>
+            <div class="field__item">
+              <div class="option">
+              {{ form_radio('rate', 3, true, {'class':'radio', 'id':'rate-positive'}) }}
+              <label class="custom-control-label" for="rate-positive">{{ __('Positive') }}</label>
+                </div>
+              <!--div class="option">
+              {{ form_radio('rate', 2, null, {'class':'radio', 'id':'rate-neutral'}) }}
+              <label class="custom-control-label" for="rate-neutral">{{ __('Neutral') }}</label>
+              </div-->
+              <div class="option">
+              {{ form_radio('rate', 1, null, {'class':'radio', 'id':'rate-negative'}) }}
+              <label class="custom-control-label" for="rate-negative">{{ __('Negative') }}</label>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="fieldset__row">
+          <div class="field">
+            <label class="field__title" for="feedback">{{ __('Deal feedback') }}</label>
+            <div class="field__item">{{ form_textarea('feedback', null, {'class' : 'textarea', 'id' : 'feedback', 'rows' : 3}) }}</div>
+          </div>
+        </div>
+        <div class="fieldset__row" style="display: none">
+          <div class="field">
+            <label class="field__title" for="feedback">{{ __('BitDeals Signature') }}</label>
+            <div class="field__item">{{ form_textarea('signature', null, {'class' : 'textarea', 'id' : 'sign', 'rows' : 3}) }}</div>
+          </div>
+        </div>
+        {#<div class="fieldset__row">
+          <div class="field">
+            <label class="field__title" for="feedback_comment">{{ __('Product review') }}</label>
+            <div class="field__item">{{ form_textarea('feedback_comment', null, {'class' : 'textarea', 'id' : 'feedback_comment', 'rows' : 3}) }}</div>
+          </div>
+        </div>#}
+        <div class="form__total">
+          {{ form_button(__('Leave feedback'), {'class' : 'btn', 'onclick': 'jQuery(\'#post_form,.popup_back\').show();'}) }}
+            {# { form_submit( __('Leave feedback') , {'class' : 'btn'}) } #}
+        </div>
+          {{ form_close() }}
+  </main>
+  <div class="popup_back" style="display:none;"></div>
+  <div class="popup modal" id="post_form" style="display: none;">
+  <a href="javascript://" onclick="jQuery('#post_form,.popup_back').hide();" class="popup__close"></a>
+        <div class="popup__header">
+            <div class="popup__title">{{ __('Sign form') }}</div>
+        </div>
+        <div class="popup__content">
+          <div  class="form">
+              <div class="fieldset" >
+              <div class="fieldset__content">
+                <div class="fieldset__row" >
+                  <div id="info-deal-text">
+                  <div class="field">
+                    <div class="field__item">{{ now_date }}</div>
+                  </div>
+                  <hr>
+                  <div class="field">
+                    <label class="field__title" for="notes-cf">{{ __("BitDeals Signature") }}:</label><div class="field__item">{{ form_textarea('signature', null, {'class' : 'textarea', 'rows' : 3, 'id': 'signature-cf', 'onchange':'jQuery(\'#sign\').val(jQuery(this).val())'}) }}
+                    </div>
+                  </div>
+                </div>
+                <div class="form__total">
+                    <button type="button" style="margin: 0" class="btn btn--accent btn--outline btn--smal" onclick="jQuery('#sign').val(jQuery('#signature-cf').val());jQuery('#feedback').submit();">{{ __('Submit') }}</button>
+                </div>
+              </div>
+            </div>
+            <div class="progress" id="indicator" style="display:none">
+              <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" style="width: 75%"></div>
+            </div>
+          </div>
+        </div>
+        </div>
+  </div>
+{% endblock %}

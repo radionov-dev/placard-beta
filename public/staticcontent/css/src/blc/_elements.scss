@@ -1,0 +1,224 @@
+.block{
+	display: block;
+}
+.inline-block{
+	display: inline-block;
+	vertical-align: middle;
+}
+.favorite{
+	display: inline-block;
+	vertical-align: middle;
+	position: relative;
+	font-size: 12px;
+	color: $color-minor;
+	padding-left: 20px;
+	span,
+	&:after,
+	&:before{
+		display: inline-block;
+	}
+	&:after{
+		content: "\2606";
+		position: absolute;
+		left: 0;
+		font-size: 18px;
+		line-height: .9;
+	}
+}
+.favorite:hover{
+	color: $color-accent;
+	span{
+		text-transform: lowercase;
+	}
+	&:before{
+		content: attr(data-add);
+	}
+}
+.is-favorite{
+	color: $color-accent;
+	&:after{
+		content: "\2605";
+	}
+}
+.is-favorite:hover{
+	color: #d55c59;
+	&:before{
+		content: attr(data-delete);
+	}
+}
+
+
+.quantity,
+.quantity__value,
+.quantity__prev,
+.quantity__next{
+	display: inline-block;
+	vertical-align: middle;
+}
+.quantity__next,
+.quantity__prev{
+	width: 10px;
+	height: 6px;
+	background-size: 10px 6px;
+	background-position: 50% 50%;
+	background-repeat: no-repeat;
+	cursor: pointer;
+}
+.quantity__prev{
+	background-image: url(/staticcontent/img/icon/arrow-smal-down.png);
+}
+.quantity__value{
+	padding: 0 7px;
+}
+.quantity__next{
+	background-image: url(/staticcontent/img/icon/arrow-smal-up.png);
+}
+
+.status{
+	display: inline-block;
+	vertical-align: middle;
+	font-size: 0;
+	width: 16px;
+	height: 16px;
+	background-position: 50% 50%;
+	background-size: 16px;
+}
+.status--like{
+	background-image: url(/staticcontent/img/icon/like.png);
+}
+.status--dislike{
+	background-image: url(/staticcontent/img/icon/dislike.png);
+}
+
+.deal-status{
+	display: inline-block;
+	vertical-align: middle;
+	padding: 5px 13px;
+	background-color: transparent;
+	border: 1px solid;
+	border-radius: 4px;
+	font-size: 12px;
+	text-transform: uppercase;
+	font-weight: 700;
+}
+.deal-status--minor{
+	color: #c6c7ca;
+}
+.deal-status--major{
+	color: $color-text;
+}
+.deal-status--fail{
+	color: #D32F2F;
+}
+.deal-status--ok{
+	color: #2ECC71;
+}
+.deal-status--small{
+	padding: 0px 5px;
+}
+.deal-status--fill{
+	color: #fff;
+	&.deal-status--major{
+		background-color: $color-text;
+		border-color: $color-text;
+	}
+	&.deal-status--minor{
+		background-color: #c6c7ca;
+		border-color: #c6c7ca;
+	}
+	&.deal-status--fail{
+		background-color: #D32F2F;
+		border-color: #D32F2F;
+	}
+	&.deal-status--ok{
+		background-color: #2ECC71;
+		border-color: #2ECC71;
+	}
+}
+
+.btn{
+	display: inline-block;
+	vertical-align: middle;
+	font-size: 12px;
+	font-weight: 700;
+	text-transform: uppercase;
+	background: $color-brand;
+	color: #fff;
+	border-radius: 4px;
+	padding: 10px 13px;
+	border: 1px solid $color-brand;
+	cursor: pointer;
+	outline: none;
+	&:hover{
+		background: $color-brand-dark;
+		color: #fff;
+		text-decoration: none;
+		cursor: pointer;
+	}
+	&:active{
+		opacity: .5;
+		overflow: none;
+	}
+}
+.btn--outline{
+	font-weight: 700;
+	background-color: transparent;
+	color: $color-brand;
+}
+.btn--smal{
+	font-size: 12px;
+	font-weight: 600;
+	padding: 5px 13px;
+}
+.btn--big{
+	font-size: 14px;
+	padding: 15px 23px;
+}
+.btn--accent{
+	background: $color-accent;
+	border: 1px solid $color-accent;
+	&.btn--outline{
+		background-color: transparent;
+		color: $color-accent;
+	}
+	&:hover{
+		background: $color-accent-dark;
+		color: #fff;
+		border: 1px solid $color-accent-dark;
+	}
+}
+.btn--minor{
+	background: #c6c7ca;
+	border: 1px solid #c6c7ca;
+	&.btn--outline{
+		background-color: transparent;
+		color: #c6c7ca;
+	}
+	&:hover{
+		background: #b3b3b3;
+		color: #fff;
+		border: 1px solid #b3b3b3;
+	}
+}
+.btn--simple{
+	background: transparent;
+	color: $color-accent;
+	padding-left: 0;
+	padding-right: 0;
+	border: 1px solid transparent;
+	&:hover{
+		background: transparent;
+		color: #ee6f0b;
+	}
+}
+.btn--order{
+	background: $color-accent;
+	border: 1px solid $color-accent;
+	font-size: 18px;
+	padding: 10px 73px;
+	&:hover{
+		background: $color-accent-dark;
+		color: #fff;
+		border: 1px solid $color-accent-dark;
+	}
+}

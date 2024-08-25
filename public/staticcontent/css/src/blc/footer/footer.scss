@@ -1,0 +1,21 @@
+.footer {
+	@include container;
+	@include clearfix;
+	margin-top: 50px;
+	margin-bottom: 40px;
+	color: #a0a2a7;
+}
+
+	.footer__copy {
+		float: left;
+		margin-top: 0;
+		margin-bottom: 0;
+		width: 30%;
+		@include media(phone-smartphone) {
+			float: none;
+			width: 100%;
+		}
+	}
+
+
+@import "elm/nav";

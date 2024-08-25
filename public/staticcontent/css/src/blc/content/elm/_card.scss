@@ -1,0 +1,717 @@
+.catalogCard{
+	display: inline-block;
+	display: flex;
+	vertical-align: top;
+	text-align: left;
+	width: 100%;
+}
+.catalogCard__pic{
+	max-width: 256px;
+	max-height: 256px;
+}
+.catalogCard__img{}
+.catalogCard__data{
+	
+}
+.catalogCard__title{
+	font-size: 18px;
+	font-weight: 600;
+	margin-bottom: 3px;
+	@include media(phone-phablet) {
+		font-size: 16px;
+	}
+	
+}
+.catalogCard__data > p {
+	position: relative;
+	overflow: hidden;
+}
+.catalogCard__params{}
+.catalogCard__param{
+	display: inline-block;
+	vertical-align: middle;
+}
+.catalogCard__priceTitle{
+	font-size: 12px;
+}
+.catalogCard__priceFrom{
+	font-size: 21px;
+	font-weight: 600;
+}
+.catalogCard__priceTo{
+	font-size: 12px;
+}
+.slider,
+.catalog--cell{
+	.catalogCard{
+		flex-direction: column;
+	}
+	.catalogCard__pic{
+		margin-bottom: 20px;
+	}
+	.catalogCard__img{
+		vertical-align: middle;
+		width: 100%;
+	}
+	.catalogCard__data{
+		flex-grow: 1;
+	}
+	.catalogCard__params{
+		margin-bottom: 20px;
+	}
+	.catalogCard__total{
+		text-align: justify;
+		text-align-last: justify;
+		.favorite{
+			display: inline-block;
+		}
+	}
+	.catalogCard__price{
+		display: inline-block;
+		text-align-last: left;
+	}
+}
+
+.catalog--line{
+	.catalogCard{
+		border-top: 1px solid #ececed;
+		margin-top: -1px;
+		font-size: 0;
+		vertical-align: middle;
+	}
+	.catalogCard__pic,
+	.catalogCard__data,
+	.catalogCard__total{
+		display: inline-block;
+		vertical-align: middle;
+	}
+	.catalogCard__pic{
+		width: 150px;
+	}
+	.catalogCard__img{
+		vertical-align: middle;
+		width: 100%;
+	}
+	.catalogCard__data{
+		width: calc(100% - 150px - 185px);
+		padding: 23px 0 25px 40px;
+		display: flex;
+		flex-direction: column;
+		justify-content: space-between;
+		@include media(phone-phablet) {
+			padding: 15px 0 15px 20px;
+		}
+	}
+	.catalogCard__total{
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: flex-end;
+		text-align: right;
+		margin-left: auto;
+		padding: 25px 27px 25px 0;
+		width: 185px;
+		.favorite{
+			margin-top: 7px;
+		}
+	}
+}
+
+
+.slider{
+	.catalogCard{
+		background-color: #fff;
+	}
+	.catalogCard__title{
+		display: block;
+		height: 51px;
+		overflow: hidden;
+	}
+	.catalogCard__data{
+		padding: 0 25px;
+	}
+	.catalogCard__params{
+		min-height: 70px;
+	}
+	.catalogCard__total{
+		padding: 0 25px 25px;
+	}
+	.favorite{
+		margin-top: 10px;
+	}
+}
+
+
+.cardFull{
+	@include clearfix;
+	margin-bottom: 47px;
+	.fotorama__fullscreen-icon{
+		&:before{
+			content: "";
+			position: absolute;
+			top: 0;
+			right: 0;
+			width: 300px;
+			height: 300px;
+		}
+	}
+}
+.cardFull__user,
+.cardFull__gallery{
+	float: right;
+	width: 300px;
+	@include media(custom, 0px, 960px) {
+		float: none;
+		width: 100%;
+	}
+}
+.cardFull__user{
+	clear: right;
+	margin-top: 22px;
+	@include media(custom, 0px, 960px) {
+		margin-top: 30px;
+	}
+}
+.cardFull__action{
+	padding-left: 55px;
+	margin-top: 5px;
+}
+.cardFull__actionItem{
+	margin-top: 10px;
+	@include media(custom, 0px, 960px) {
+		display: inline-block;
+		vertical-align: middle;
+		margin-top: 10px;
+		margin-right: 15px;
+	}
+	@include media(phone) {
+		display: block;
+	}
+}
+.cardFull__title,
+.cardFull__data{
+	float: left;
+	width: calc(100% - 326px);
+	@include media(custom, 0px, 960px) {
+		float: none;
+		width: 100%;
+	}
+}
+.cardFull__title{
+	margin-top: -10px;
+	font-size: 30px;
+	@include media(phone) {
+		font-size: 22px;
+	}
+}
+
+.cardFull__gallery{
+	width: 300px;
+	@include media(custom, 0px, 960px) {
+		width: 100%;
+		margin-bottom: 50px;
+	}
+}
+
+.cardFull__data{}
+.cardData__title{
+	font-size: 18px;
+	font-weight: 600;
+	margin: 36px 0 15px;
+}
+
+.cardTable{
+	display: table;
+	border-collapse: collapse;
+	width: 100%;
+	.error{
+		font-size: 12px;
+		color: #f44336;
+	}
+}
+.cardTable__header,
+.cardTable__row{
+	display: table-row;
+}
+.cardTable__cell{
+	display: table-cell;
+	text-align: right;
+	&:first-child{
+		text-align: left;
+	}
+}
+.cardTable__header{
+	color: $color-minor;
+	border-bottom: 1px solid #ececed;
+	.cardTable__cell{
+		padding: 0px 0 20px;
+	}
+
+}
+.cardTable__row{
+	.cardTable__cell{
+		padding: 20px 0 0px;
+	}
+}
+
+.cardTable--2{
+	.cardTable__cell{
+		&:first-child{
+			width: 25%;
+		}
+	}
+}
+.cardTableOverfollow{
+	@include media(phone-smartphone) {
+		width: 100%;
+		overflow-x: auto;
+		.cardTable--2{
+			min-width: 500px;
+		}
+	}
+}
+.cardData__total{
+	@include clearfix;
+	clear: both;
+	font-size: 0;
+	padding-top: 35px;
+	.favorite{
+		margin-left: 30px;
+	}
+}
+.cardData__price,
+.cardData__btn{
+	height: 50px;
+	display: inline-block;
+	vertical-align: middle;
+	padding: 0 15px;
+	cursor: pointer;
+
+}
+.cardData__price{
+	border: 1px solid #d9dadc;
+	border-right: none;
+	border-radius: 5px 0px 0 5px;
+	font-size: 32px;
+	line-height: 50px;
+	@include media(phone) {
+		font-size: 24px;
+	}
+}
+.cardData__btn{
+	font-size: 20px;
+	font-weight: 600;
+	line-height: 50px;
+	color: #fff;
+	background-color: #ee6f0b;
+	border-radius: 0px 5px 5px 0px;
+	@include media(phone) {
+		font-size: 18px;
+	}
+	&:hover{
+		color: #fff;
+		background-color: #ff7200;
+		text-decoration: none;
+	}
+}
+
+.dealCard{
+	position: relative;
+	font-size: 0;
+	display: flex;
+	border-bottom: 1px solid #ececed;
+	margin-top: -1px;
+	@include media(phone-phablet) {
+		display: block;
+	}
+}
+.dealList__item:last-child{
+	.dealCard{
+		border-bottom: none;
+	}
+}
+.dealCard--buy,
+.dealCard--sale{
+	&:before{
+		content: "";
+		display: inline-block;
+		position: absolute;
+		top: 6px;
+		left: 6px;
+		font-size: 14px;
+		font-weight: 700;
+		line-height: 1;
+		padding: 5px 8px;
+		color: #fff;
+		border-radius: 5px;
+		@include media(phone-phablet) {
+			left: auto;
+			right: 16px;
+			top: 16px;
+		}
+		@include media(phone) {
+			top: 95px;
+			right: 0;
+		}
+	}
+}
+.dealCard--buy{
+	&:before{
+		content: "BUY";
+		background-color: #8bc34a;
+	}
+}
+.dealCard--sale{
+	&:before{
+		content: "SALE";
+		background-color: #ff5722;
+	}
+}
+.accent{
+	background-color: #fff6e9;
+	border-bottom: none;
+	.dealCard__title{
+		&:before{
+			background: linear-gradient(to right, rgba(255, 246, 233, 0) 10%, rgba(255, 246, 233, 1) 45%);
+		}
+	}
+}
+.dealCard__pic,
+.dealCard__data,
+.dealCard__user,
+.dealCard__total{
+	display: inline-block;
+	vertical-align: top;	
+}
+
+.dealCard__pic{
+	width: 150px;
+	height: 150px;
+	flex-shrink: 0;
+	@include media(phone-phablet) {
+		float: right;
+		margin-top: 10px;
+		margin-right: 10px;
+	}
+	@include media(phone) {
+		width: 80px;
+		height: 80px;
+	}
+}
+.dealCard__img{
+	max-width: 100%;
+	max-height: 100%;
+}
+.dealCard__data{
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	width: calc(100% - 150px - 140px - 230px);
+	padding-top: 5px;
+	padding-bottom: 5px;
+	padding-left: 40px;
+	@include media(phone-tablet) {
+		width: calc(100% - 150px - 200px);
+	}
+	@include media(phone-phablet) {
+		width: calc(100% - 160px);
+		padding-left: 0;
+		padding-right: 15px;
+	}
+	@include media(phone) {
+		width: calc(100% - 90px);
+	}
+}
+.notice{
+	.dealCard{
+		border: none;
+		width: 80%;
+		float: left;
+		@include media(phone-smartphone) {
+			width: 100%;
+			float: none;
+		}
+	}
+	.dealCard__data{
+		width: 100%;
+		@include media(phone-phablet) {
+			width: calc(100% - 160px);
+			padding-left: 0;
+			padding-right: 15px;
+		}
+		@include media(phone) {
+			width: calc(100% - 90px);
+		}
+	}
+}
+.dealCard__title{
+	color: $color-text;
+	position: relative;
+	font-size: 21px;
+	font-weight: 600;
+	max-height: 63px;
+	overflow: hidden;
+	margin: 0;
+	&:before{
+		content: "";
+		position: absolute;
+		width: 40px;
+		height: 27px;
+		bottom: 0;
+		right: 0;
+		background: linear-gradient(to right, rgba(255, 255, 255, 0) 10%, rgba(255, 255, 255, 1) 45%);
+	}
+	@include media(custom, 0px, 920px) {
+		font-size: 18px;
+		max-height: 80px
+	}
+	@include media(phone-phablet) {
+		max-height: 100%;
+	}
+	@include media(phone) {
+		margin-bottom: 15px;
+		font-size: 16px;
+		&:before{
+			display: none;
+		}
+	}
+}
+.dealCard__price{
+	font-size: 16px;
+	font-weight: 700;
+	@include media(custom, 0px, 920px) {
+		font-size: 14px;
+	}
+}
+.dealCard__wrap{
+	display: inline-block;
+	vertical-align: top;
+	@include media(phone-tablet) {
+		text-align: right;
+		width: 200px;
+	}
+	@include media(phone-phablet) {
+		width: 100%;
+		text-align: left;
+		@include clearfix;
+	}
+	@include media(phone) {
+		display: flex;
+		flex-direction: column;
+	}
+}
+.dealCard__user{
+	position: relative;
+	width: 230px;
+	text-align: right;
+	padding-right: 10px;
+	padding-left: 35px;
+	margin-top: 10px;
+	@include media(phone-tablet) {
+		padding-right: 0;
+		width: 200px;
+		padding-left: 10px;
+	}
+	@include media(phone-phablet) {
+		text-align: left;
+		width: 100%;
+	}
+	@include media(phone) {
+		padding-left: 10px;
+		order: 2;
+		margin-bottom: 20px;
+	}
+}
+.dealCard__mail{
+	display: inline-block;
+	position: absolute;
+	width: 18px;
+	height: 12px;
+	left: 0px;
+	top: 15px;
+	background-image: url(/staticcontent/img/icon/mail.png);
+	background-size: 18px;
+	@include media(phone-phablet) {
+		position: relative;
+		top: 6px;
+		margin-right: 20px;
+	}
+	@include media(phone) {
+		position: absolute;
+		left: auto;
+		right: 37px;
+		margin-right: 0;
+	}
+}
+.dealCard__status{
+	.deal-status{
+		margin-right: 8px;
+	}
+}
+.dealCard__total{
+	margin-top: 10px;
+	width: 140px;
+	border-top: none;
+	.deal-status,
+	.btn{
+		margin: 3px;
+	}
+	@include media(phone-tablet) {
+		margin-top: 5px;
+	}
+	@include media(phone-phablet) {
+		width: 100%;
+		margin-top: 20px;
+		margin-bottom: 15px;
+	}
+	@include media(phone) {
+		order: 1;
+	}
+}
+
+.dealDetail{
+	.dealCard{
+		display: block;
+		border: none;
+	}
+	.dealCard__pic{
+		@include media(phone-tablet) {
+			margin: 0;
+		}
+	}
+	.dealCard__data{
+		display: inline-block;
+		width: calc(100% - 150px - 270px);
+		@include media(custom, 0px, 920px) {
+			width: calc(100% - 150px);
+		}
+		@include media(phone) {
+			width: calc(100% - 80px);
+		}
+	}
+	.dealCard__title{
+		max-height: 100%;
+		margin-bottom: 20px;
+		&:before{
+			display: none;
+		}
+	}
+	.dealCard__params{
+		.block{
+			margin-top: 15px;
+		}
+	}
+	.dealCard__user{
+		width: 270px;
+		padding-right: 0;
+		@include media(custom, 0px, 920px) {
+			width: auto;
+		}
+	}
+	.dealCard__total{
+		width: 100%;
+		padding-left: 185px;
+		@include media(custom, 0px, 920px) {
+			padding-left: 0;
+			margin-top: 30px;
+		}
+	}
+}
+
+
+.uploadCard{
+	margin-bottom: 30px;
+	display: inline-block;
+	vertical-align: top;
+}
+.uploadCard__delete{
+	color: #d32f2f;
+	display: inline-block;
+	&:before{
+		content: "";
+		display: inline-block;
+		vertical-align: middle;
+		width: 18px;
+		height: 18px;
+		background-image: url(/staticcontent/img/icon/delete.png);
+		background-size: 18px;
+		margin-right: 10px;
+		transition: all .2s ease;
+	}
+	&:hover{
+		text-decoration: none;
+		color: #d32f2f;
+		&:before{
+			transform: rotateZ(90deg);
+		}
+	}
+}
+.uploadCard__pic{
+	margin-top: 15px;
+	width: 150px;
+	height: 150px;
+}
+.uploadCard__img{
+	max-width: 100%;
+	max-height: 100%;
+}
+.upload__header{
+	margin-bottom: 30px;
+}
+.uploadBtn{
+	display: inline-block;
+	vertical-align: bottom;
+	color: $color-text;
+	&:before{
+		content: "";
+		display: inline-block;
+		vertical-align: middle;
+		width: 20px;
+		height: 20px;
+		background-image: url(/staticcontent/img/icon/upload.png);
+		background-size: 20px;
+		margin-right: 10px;
+		transition: all .2s ease;
+	}
+	&:hover{
+		text-decoration: none;
+		color: $color-text;
+		&:before{
+			transform: rotateY(180deg);
+		}
+	}
+}
+.inventory{
+	.inventory__item:first-child{
+		.dealCard{
+			border-top: 1px solid #ececed;
+		}
+	}
+	.inventory__item:last-child{
+		.dealCard{
+			border-bottom: none;
+		}
+	}
+	.dealCard__data{
+		width: calc(100% - 150px - 140px);
+		padding-right: 15px;
+		@include media(custom, 0px, 920px) {
+			width: calc(100% - 150px);
+			padding-right: 0;
+		}
+		@include media(phone-phablet) {
+			width: calc(100% - 160px);
+			padding-left: 0;
+			padding-right: 15px;
+		}
+		@include media(phone) {
+			width: calc(100% - 90px);
+		}
+	}
+	.dealCard__total{
+		text-align: right;
+		@include media(phone-phablet) {
+			text-align: left;
+		}
+	}
+}
